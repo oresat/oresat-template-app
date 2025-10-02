@@ -1,4 +1,4 @@
-# oresat-app-template
+# oresat-template-app
 
 OreSat firmware project template using Zephyr RTOS.
 
