@@ -2,6 +2,13 @@ menu "Zephyr"
 source "Kconfig.zephyr"
 endmenu
 
+config ACCESS_FLASH_STM32
+	default y
+	bool
+	depends on SOC_STM32F091XC
+	select USE_STM32_HAL_FLASH
+	select USE_STM32_HAL_FLASH_EX
+
 module = APP_TEMPLATE
 module-str = APP TEMPLATE
 
