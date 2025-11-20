@@ -1,0 +1,30 @@
+&pinctrl {
+	pinmux_flexcomm2_lpi2c: pinmux_flexcomm2_lpi2c {
+		group0 {
+			pinmux = <FC2_P0_PIO4_0>, // SDA  Header: J7  Pin: 8
+    			     <FC2_P1_PIO4_1>; // SCL  Header: J7  Pin: 6
+			slew-rate = "fast";
+			drive-strength = "low";
+			input-enable;
+			bias-pull-up;
+			drive-open-drain;
+		};
+	};
+
+    pinmux_dac0: pinmux_dac0 {
+        group0 {
+            pinmux = <DAC0_OUT_PIO4_2>; // Header: J1  Pin: 4
+            drive-strength = "low";
+            slew-rate = "fast";
+        };
+    };
+
+    pinmux_lpadc0: pinmux_lpadc0 {
+        group0 {
+            pinmux = <ADC0_A14_PIO0_22>, // Header: J4  Pin: 8
+                     <ADC0_A15_PIO0_23>; // Header: J4  Pin: 12
+            slew-rate = "fast";
+            drive-strength = "low";
+        };
+    };
+};

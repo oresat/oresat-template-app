@@ -1,3 +1,6 @@
+# Copyright (c) 2024 Centro de Inovacao EDGE.
+# SPDX-License-Identifier: Apache-2.0
+
 menu "Zephyr"
 source "Kconfig.zephyr"
 endmenu
@@ -5,3 +8,54 @@ endmenu
 module = APP_TEMPLATE
 module-str = APP TEMPLATE
 
+config BOARD_OVERLAY_PRESENT
+    bool
+    default $(dt_nodelabel_exists,oresat_demo)
+
+if BOARD_OVERLAY_PRESENT
+
+    menu "Oresat demo options"
+
+    config BLINK_DEMO
+        bool "Blink an LED"
+        default y
+        help
+        Enable the thread which blinks an LED.
+
+    config I2C_SENSOR_DEMO
+        bool "Enable monitoring an I2C sensor"
+        default y
+        help
+        Enable reading from a Bosch Sensortec BME280.
+
+    config DAC_DEMO
+        bool "Enable generation of a sawtooth pattern."
+        default y
+        help
+        Enable a slowly repeating sawtooth from 0 to 3.3v.
+
+    config ADC_DEMO
+        bool "Enable monitoring one or more ADC channels."
+        default y
+        help
+        Outputs the data scaled to mV.
+
+    if ADC_DEMO
+
+        config SEQUENCE_SAMPLES
+            int "Number of samples to be made on the sequence for each channel."
+            default 5
+
+        config SEQUENCE_RESOLUTION
+            int "Set the resolution of the sequence readings."
+            default 12
+
+        config SEQUENCE_32BITS_REGISTERS
+            bool "ADC data sequences are on 32bits"
+            default n
+
+    endif  # ADC_DEMO
+
+    endmenu
+
+endif # BOARD_OVERLAY_PRESENT
