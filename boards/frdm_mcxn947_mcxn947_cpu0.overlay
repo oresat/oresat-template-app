@@ -10,9 +10,6 @@
         dac = <&dac0>;
         dac_channel_id = <0>;
         dac_resolution = <12>;
-
-        adc = <&lpadc0>;
-        i2c = <&flexcomm2_lpi2c2>;
     };
 
     aliases {
