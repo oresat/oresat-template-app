@@ -31,8 +31,14 @@
 struct sCO_OD_RAM CO_OD_RAM = {
            CO_OD_FIRST_LAST_WORD,
 
+/*1001*/ 0x0L,
+/*1003*/ {0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1200*/ {{0x2L, 0x0600L, 0x0580L}},
+/*1F80*/ 0x0000L,
+/*2100*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 /*4000*/ {0x16L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x0, 0x0, 0x0, 0x0, 0x0L},
 /*4001*/ {0x16L, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0L, 0x0, 0x0, 0x0, 0x0, 0x0L},
+/*4002*/ {0x0L, 0x0L, 0x0L, 0x0L, 0x0L, 0x0L},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -60,6 +66,13 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
 struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
            CO_OD_FIRST_LAST_WORD,
 
+/*1014*/ 0x0080L,
+/*1015*/ 0x00,
+/*1016*/ {0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*1017*/ 0x00,
+/*1029*/ {0x0L, 0x0L},
+/*1400*/ {{0x2L, 0x80000200L, 0xFEL}},
+/*1600*/ {{0x1L, 0x40020030L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L}},
 /*1800*/ {{0x6L, 0x40000180L, 0xFEL, 0x00, 0x0L, 0x2710, 0x0L},
 /*1801*/ {0x6L, 0x40000280L, 0xFEL, 0x00, 0x0L, 0x2710, 0x0L},
 /*1802*/ {0x6L, 0x40000380L, 0xFEL, 0x00, 0x0L, 0x2710, 0x0L},
@@ -91,6 +104,30 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
    STRUCTURES FOR RECORD TYPE OBJECTS
 *******************************************************************************/
 
+
+/*0x1200*/ const CO_OD_entryRecord_t OD_record1200[3] = {
+           {(void*)&CO_OD_RAM.SDOServerParameter[0].highestSubIndexSupported, 0x06, 0x1 },
+           {(void*)&CO_OD_RAM.SDOServerParameter[0].COB_IDClientToServer, 0xA6, 0x4 },
+           {(void*)&CO_OD_RAM.SDOServerParameter[0].COB_IDServerToClient, 0xA6, 0x4 },
+};
+
+/*0x1400*/ const CO_OD_entryRecord_t OD_record1400[3] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[0].highestSubIndexSupported, 0x07, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[0].COB_IDUsedByRPDO, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOCommunicationParameter[0].transmissionType, 0x0F, 0x1 },
+};
+
+/*0x1600*/ const CO_OD_entryRecord_t OD_record1600[9] = {
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].numberOfMappedApplicationObjectsInPDO, 0x0F, 0x1 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject1, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject2, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject3, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject4, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject5, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject6, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject7, 0x8F, 0x4 },
+           {(void*)&CO_OD_PERSIST_COMM.RPDOMappingParameter[0].applicationObject8, 0x8F, 0x4 },
+};
 
 /*0x1800*/ const CO_OD_entryRecord_t OD_record1800[7] = {
            {(void*)&CO_OD_PERSIST_COMM.TPDOCommunicationParameter[0].highestSubIndexSupported, 0x07, 0x1 },
@@ -368,6 +405,16 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
    OBJECT DICTIONARY
 *******************************************************************************/
 const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
+{0x1001, 0x00, 0x26,  1, (void*)&CO_OD_RAM.errorRegister},
+{0x1003, 0x10, 0x8E,  4, (void*)&CO_OD_RAM.preDefinedErrorField[0]},
+{0x1014, 0x00, 0x8F,  4, (void*)&CO_OD_PERSIST_COMM.COB_ID_EMCY},
+{0x1015, 0x00, 0x8F,  2, (void*)&CO_OD_PERSIST_COMM.inhibitTimeEMCY},
+{0x1016, 0x08, 0x8F,  4, (void*)&CO_OD_PERSIST_COMM.consumerHeartbeatTime[0]},
+{0x1017, 0x00, 0x8F,  2, (void*)&CO_OD_PERSIST_COMM.producerHeartbeatTime},
+{0x1029, 0x02, 0x0F,  1, (void*)&CO_OD_PERSIST_COMM.errorBehavior[0]},
+{0x1200, 0x02, 0x00,  0, (void*)&OD_record1200},
+{0x1400, 0x02, 0x00,  0, (void*)&OD_record1400},
+{0x1600, 0x08, 0x00,  0, (void*)&OD_record1600},
 {0x1800, 0x06, 0x00,  0, (void*)&OD_record1800},
 {0x1801, 0x06, 0x00,  0, (void*)&OD_record1801},
 {0x1802, 0x06, 0x00,  0, (void*)&OD_record1802},
@@ -388,7 +435,10 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1A07, 0x08, 0x00,  0, (void*)&OD_record1A07},
 {0x1A08, 0x08, 0x00,  0, (void*)&OD_record1A08},
 {0x1A09, 0x08, 0x00,  0, (void*)&OD_record1A09},
+{0x1F80, 0x00, 0x8E,  4, (void*)&CO_OD_RAM.NMTStartup},
+{0x2100, 0x00, 0x0E, 32, (void*)&CO_OD_RAM.errorStatusBits},
 {0x4000, 0x16, 0x00,  0, (void*)&OD_record4000},
 {0x4001, 0x16, 0x00,  0, (void*)&OD_record4001},
+{0x4002, 0x00, 0x3E,  6, (void*)&CO_OD_RAM.time_of_day},
 };
 // clang-format on

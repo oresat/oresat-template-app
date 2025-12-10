@@ -35,6 +35,20 @@
 
    typedef domain_t     DOMAIN;
 
+#ifndef timeOfDay_t
+    typedef union {
+        unsigned long long ullValue;
+        struct {
+            unsigned long ms:28;
+            unsigned reserved:4;
+            unsigned days:16;
+            unsigned reserved2:16;
+        };
+    }timeOfDay_t;
+#endif
+
+    typedef timeOfDay_t TIME_OF_DAY;
+    typedef timeOfDay_t TIME_DIFFERENCE;
 
 /*******************************************************************************
    FILE INFO:
@@ -59,9 +73,9 @@
    FEATURES
 *******************************************************************************/
   #define CO_NO_SYNC                     0   //Associated objects: 1005-1007
-  #define CO_NO_EMERGENCY                0   //Associated objects: 1014, 1015
+  #define CO_NO_EMERGENCY                1   //Associated objects: 1014, 1015
   #define CO_NO_TIME                     0   //Associated objects: 1012, 1013
-  #define CO_NO_SDO_SERVER               0   //Associated objects: 1200-127F
+  #define CO_NO_SDO_SERVER               1   //Associated objects: 1200-127F
   #define CO_NO_SDO_CLIENT               0   //Associated objects: 1280-12FF
   #define CO_NO_GFC                      0   //Associated objects: 1300
   #define CO_NO_SRDO                     0   //Associated objects: 1301-1341, 1381-13C0
@@ -69,7 +83,7 @@
   #define CO_NO_LSS_CLIENT               0   //LSS Master
   #define CO_NODE_GUARDING_SLAVE         0   //NG Slave
   #define CO_NODE_GUARDING_MASTER        0   //NG Master
-  #define CO_NO_RPDO                     0   //Associated objects: 14xx, 16xx
+  #define CO_NO_RPDO                     1   //Associated objects: 14xx, 16xx
   #define CO_NO_TPDO                     10   //Associated objects: 18xx, 1Axx
   #define CO_NO_NMT_MASTER               0
   #define CO_NO_TRACE                    0
@@ -78,12 +92,33 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             22
+   #define CO_OD_NoOfElements             35
 
 
 /*******************************************************************************
    TYPE DEFINITIONS FOR RECORDS
 *******************************************************************************/
+/*1200      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED32     COB_IDClientToServer;
+               UNSIGNED32     COB_IDServerToClient;
+               }              OD_SDOServerParameter_t;
+/*1400      */ typedef struct {
+               UNSIGNED8      highestSubIndexSupported;
+               UNSIGNED32     COB_IDUsedByRPDO;
+               UNSIGNED8      transmissionType;
+               }              OD_RPDOCommunicationParameter_t;
+/*1600      */ typedef struct {
+               UNSIGNED8      numberOfMappedApplicationObjectsInPDO;
+               UNSIGNED32     applicationObject1;
+               UNSIGNED32     applicationObject2;
+               UNSIGNED32     applicationObject3;
+               UNSIGNED32     applicationObject4;
+               UNSIGNED32     applicationObject5;
+               UNSIGNED32     applicationObject6;
+               UNSIGNED32     applicationObject7;
+               UNSIGNED32     applicationObject8;
+               }              OD_RPDOMappingParameter_t;
 /*1800      */ typedef struct {
                UNSIGNED8      highestSubIndexSupported;
                UNSIGNED32     COB_IDUsedByTPDO;
@@ -161,6 +196,86 @@
    some of those are redundant with CO_SDO.h CO_ObjDicId_t <Common CiA301 object
    dictionary entries>
 *******************************************************************************/
+/*1001 */
+        #define OD_1001_errorRegister                               0x1001
+
+/*1003 */
+        #define OD_1003_preDefinedErrorField                        0x1003
+
+        #define OD_1003_0_preDefinedErrorField_maxSubIndex          0
+        #define OD_1003_1_preDefinedErrorField_standardErrorField   1
+        #define OD_1003_2_preDefinedErrorField_standardErrorField   2
+        #define OD_1003_3_preDefinedErrorField_standardErrorField   3
+        #define OD_1003_4_preDefinedErrorField_standardErrorField   4
+        #define OD_1003_5_preDefinedErrorField_standardErrorField   5
+        #define OD_1003_6_preDefinedErrorField_standardErrorField   6
+        #define OD_1003_7_preDefinedErrorField_standardErrorField   7
+        #define OD_1003_8_preDefinedErrorField_standardErrorField   8
+        #define OD_1003_9_preDefinedErrorField_standardErrorField   9
+        #define OD_1003_10_preDefinedErrorField_standardErrorField  10
+        #define OD_1003_11_preDefinedErrorField_standardErrorField  11
+        #define OD_1003_12_preDefinedErrorField_standardErrorField  12
+        #define OD_1003_13_preDefinedErrorField_standardErrorField  13
+        #define OD_1003_14_preDefinedErrorField_standardErrorField  14
+        #define OD_1003_15_preDefinedErrorField_standardErrorField  15
+        #define OD_1003_16_preDefinedErrorField_standardErrorField  16
+
+/*1014 */
+        #define OD_1014_COB_ID_EMCY                                 0x1014
+
+/*1015 */
+        #define OD_1015_inhibitTimeEMCY                             0x1015
+
+/*1016 */
+        #define OD_1016_consumerHeartbeatTime                       0x1016
+
+        #define OD_1016_0_consumerHeartbeatTime_maxSubIndex         0
+        #define OD_1016_1_consumerHeartbeatTime_consumerHeartbeatTime 1
+        #define OD_1016_2_consumerHeartbeatTime_consumerHeartbeatTime 2
+        #define OD_1016_3_consumerHeartbeatTime_consumerHeartbeatTime 3
+        #define OD_1016_4_consumerHeartbeatTime_consumerHeartbeatTime 4
+        #define OD_1016_5_consumerHeartbeatTime_consumerHeartbeatTime 5
+        #define OD_1016_6_consumerHeartbeatTime_consumerHeartbeatTime 6
+        #define OD_1016_7_consumerHeartbeatTime_consumerHeartbeatTime 7
+        #define OD_1016_8_consumerHeartbeatTime_consumerHeartbeatTime 8
+
+/*1017 */
+        #define OD_1017_producerHeartbeatTime                       0x1017
+
+/*1029 */
+        #define OD_1029_errorBehavior                               0x1029
+
+        #define OD_1029_0_errorBehavior_maxSubIndex                 0
+        #define OD_1029_1_errorBehavior_communicationError          1
+        #define OD_1029_2_errorBehavior_profileOrManufacturerSpecificError 2
+
+/*1200 */
+        #define OD_1200_SDOServerParameter                          0x1200
+
+        #define OD_1200_0_SDOServerParameter_maxSubIndex            0
+        #define OD_1200_1_SDOServerParameter_COB_IDClientToServer   1
+        #define OD_1200_2_SDOServerParameter_COB_IDServerToClient   2
+
+/*1400 */
+        #define OD_1400_RPDOCommunicationParameter                  0x1400
+
+        #define OD_1400_0_RPDOCommunicationParameter_maxSubIndex    0
+        #define OD_1400_1_RPDOCommunicationParameter_COB_IDUsedByRPDO 1
+        #define OD_1400_2_RPDOCommunicationParameter_transmissionType 2
+
+/*1600 */
+        #define OD_1600_RPDOMappingParameter                        0x1600
+
+        #define OD_1600_0_RPDOMappingParameter_maxSubIndex          0
+        #define OD_1600_1_RPDOMappingParameter_applicationObject1   1
+        #define OD_1600_2_RPDOMappingParameter_applicationObject2   2
+        #define OD_1600_3_RPDOMappingParameter_applicationObject3   3
+        #define OD_1600_4_RPDOMappingParameter_applicationObject4   4
+        #define OD_1600_5_RPDOMappingParameter_applicationObject5   5
+        #define OD_1600_6_RPDOMappingParameter_applicationObject6   6
+        #define OD_1600_7_RPDOMappingParameter_applicationObject7   7
+        #define OD_1600_8_RPDOMappingParameter_applicationObject8   8
+
 /*1800 */
         #define OD_1800_TPDOCommunicationParameter                  0x1800
 
@@ -401,6 +516,12 @@
         #define OD_1A09_7_TPDOMappingParameter_applicationObject7   7
         #define OD_1A09_8_TPDOMappingParameter_applicationObject8   8
 
+/*1F80 */
+        #define OD_1F80_NMTStartup                                  0x1F80
+
+/*2100 */
+        #define OD_2100_errorStatusBits                             0x2100
+
 /*4000 */
         #define OD_4000_pack_1                                      0x4000
 
@@ -455,6 +576,9 @@
         #define OD_4001_21_pack_2_temperature_min                   21
         #define OD_4001_22_pack_2_status                            22
 
+/*4002 */
+        #define OD_4002_time_of_day                                 0x4002
+
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
 *******************************************************************************/
@@ -464,8 +588,14 @@
 struct sCO_OD_RAM{
                UNSIGNED32     FirstWord;
 
+/*1001      */ UNSIGNED8      errorRegister;
+/*1003      */ UNSIGNED32      preDefinedErrorField[16];
+/*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
+/*1F80      */ UNSIGNED32     NMTStartup;
+/*2100      */ OCTET_STRING   errorStatusBits[32];
 /*4000      */ OD_pack_1_t     pack_1;
 /*4001      */ OD_pack_2_t     pack_2;
+/*4002      */ OCTET_STRING   time_of_day[6];
 
                UNSIGNED32     LastWord;
 };
@@ -490,6 +620,13 @@ struct sCO_OD_EEPROM{
 struct sCO_OD_PERSIST_COMM{
                UNSIGNED32     FirstWord;
 
+/*1014      */ UNSIGNED32     COB_ID_EMCY;
+/*1015      */ UNSIGNED16     inhibitTimeEMCY;
+/*1016      */ UNSIGNED32      consumerHeartbeatTime[8];
+/*1017      */ UNSIGNED16     producerHeartbeatTime;
+/*1029      */ UNSIGNED8       errorBehavior[2];
+/*1400      */ OD_RPDOCommunicationParameter_t RPDOCommunicationParameter[1];
+/*1600      */ OD_RPDOMappingParameter_t RPDOMappingParameter[1];
 /*1800      */ OD_TPDOCommunicationParameter_t TPDOCommunicationParameter[10];
 /*1A00      */ OD_TPDOMappingParameter_t TPDOMappingParameter[10];
 
@@ -508,6 +645,53 @@ extern struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM;
 /*******************************************************************************
    ALIASES FOR OBJECT DICTIONARY VARIABLES
 *******************************************************************************/
+/*1001, Data Type: UNSIGNED8 */
+        #define OD_errorRegister_idx                                0x1001
+        #define OD_errorRegister                                    CO_OD_RAM.errorRegister
+
+/*1003, Data Type: UNSIGNED32, Array[16] */
+        #define OD_preDefinedErrorField_idx                         0x1003
+        #define OD_preDefinedErrorField                             CO_OD_RAM.preDefinedErrorField
+        #define ODL_preDefinedErrorField_arrayLength                16
+        #define ODA_preDefinedErrorField_standardErrorField         0
+
+/*1014, Data Type: UNSIGNED32 */
+        #define OD_COB_ID_EMCY_idx                                  0x1014
+        #define OD_COB_ID_EMCY                                      CO_OD_PERSIST_COMM.COB_ID_EMCY
+
+/*1015, Data Type: UNSIGNED16 */
+        #define OD_inhibitTimeEMCY_idx                              0x1015
+        #define OD_inhibitTimeEMCY                                  CO_OD_PERSIST_COMM.inhibitTimeEMCY
+
+/*1016, Data Type: UNSIGNED32, Array[8] */
+        #define OD_consumerHeartbeatTime_idx                        0x1016
+        #define OD_consumerHeartbeatTime                            CO_OD_PERSIST_COMM.consumerHeartbeatTime
+        #define ODL_consumerHeartbeatTime_arrayLength               8
+        #define ODA_consumerHeartbeatTime_consumerHeartbeatTime     0
+
+/*1017, Data Type: UNSIGNED16 */
+        #define OD_producerHeartbeatTime_idx                        0x1017
+        #define OD_producerHeartbeatTime                            CO_OD_PERSIST_COMM.producerHeartbeatTime
+
+/*1029, Data Type: UNSIGNED8, Array[2] */
+        #define OD_errorBehavior_idx                                0x1029
+        #define OD_errorBehavior                                    CO_OD_PERSIST_COMM.errorBehavior
+        #define ODL_errorBehavior_arrayLength                       2
+        #define ODA_errorBehavior_communicationError                0
+        #define ODA_errorBehavior_profileOrManufacturerSpecificError 1
+
+/*1200, Data Type: SDOServerParameter_t */
+        #define OD_SDOServerParameter_idx                           0x1200
+        #define OD_SDOServerParameter                               CO_OD_RAM.SDOServerParameter
+
+/*1400, Data Type: RPDOCommunicationParameter_t */
+        #define OD_RPDOCommunicationParameter_idx                   0x1400
+        #define OD_RPDOCommunicationParameter                       CO_OD_PERSIST_COMM.RPDOCommunicationParameter
+
+/*1600, Data Type: RPDOMappingParameter_t */
+        #define OD_RPDOMappingParameter_idx                         0x1600
+        #define OD_RPDOMappingParameter                             CO_OD_PERSIST_COMM.RPDOMappingParameter
+
 /*1800, Data Type: TPDOCommunicationParameter_t */
         #define OD_TPDOCommunicationParameter_idx                   0x1800
         #define OD_TPDOCommunicationParameter                       CO_OD_PERSIST_COMM.TPDOCommunicationParameter
@@ -516,6 +700,15 @@ extern struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM;
         #define OD_TPDOMappingParameter_idx                         0x1A00
         #define OD_TPDOMappingParameter                             CO_OD_PERSIST_COMM.TPDOMappingParameter
 
+/*1F80, Data Type: UNSIGNED32 */
+        #define OD_NMTStartup_idx                                   0x1F80
+        #define OD_NMTStartup                                       CO_OD_RAM.NMTStartup
+
+/*2100, Data Type: OCTET_STRING */
+        #define OD_errorStatusBits_idx                              0x2100
+        #define OD_errorStatusBits                                  CO_OD_RAM.errorStatusBits
+        #define ODL_errorStatusBits_stringLength                    32
+
 /*4000, Data Type: pack_1_t */
         #define OD_pack_1_idx                                       0x4000
         #define OD_pack_1                                           CO_OD_RAM.pack_1
@@ -523,6 +716,11 @@ extern struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM;
 /*4001, Data Type: pack_2_t */
         #define OD_pack_2_idx                                       0x4001
         #define OD_pack_2                                           CO_OD_RAM.pack_2
+
+/*4002, Data Type: OCTET_STRING */
+        #define OD_time_of_day_idx                                  0x4002
+        #define OD_time_of_day                                      CO_OD_RAM.time_of_day
+        #define ODL_time_of_day_stringLength                        6
 
 #endif
 // clang-format on
