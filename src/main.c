@@ -67,6 +67,20 @@ int main(void)
 	while (true) {
 		timeout = 1000U;
 		timestamp = k_uptime_get();
+
+		bool_t syncWas = false;
+
+		/* Process Sync */
+		//syncWas = CO_process_SYNC(CO, timeout);
+
+		/* Read inputs */
+		CO_process_RPDO(CO, syncWas);
+
+		/* Further I/O or nonblocking application code may go here. */
+
+		/* Write outputs */
+		CO_process_TPDO(CO, syncWas, timeout);
+
 		reset = CO_process(CO, (uint16_t)elapsed, &timeout);
 		if (reset != CO_RESET_NOT) {
 			break;
