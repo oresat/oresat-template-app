@@ -8,8 +8,8 @@ Description=
 CreationTime=2:12PM
 CreationDate=12-06-2025
 CreatedBy=
-ModificationTime=2:41PM
-ModificationDate=12-11-2025
+ModificationTime=12:55PM
+ModificationDate=12-12-2025
 ModifiedBy=
 
 [DeviceInfo]
@@ -365,7 +365,7 @@ ObjectType=0x7
 ;StorageLocation=PERSIST_COMM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=1000
 PDOMapping=0
 
 [1029]
@@ -611,7 +611,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1800sub6]
@@ -680,7 +680,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1801sub6]
@@ -749,7 +749,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1802sub6]
@@ -818,7 +818,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1803sub6]
@@ -851,7 +851,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000180
+DefaultValue=$NODEID+0x40000180
 PDOMapping=0
 
 [1804sub2]
@@ -887,7 +887,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1804sub6]
@@ -920,7 +920,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000280
+DefaultValue=$NODEID+0x40000280
 PDOMapping=0
 
 [1805sub2]
@@ -956,7 +956,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1805sub6]
@@ -989,7 +989,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000380
+DefaultValue=$NODEID+0x40000380
 PDOMapping=0
 
 [1806sub2]
@@ -1025,7 +1025,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1806sub6]
@@ -1058,7 +1058,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000480
+DefaultValue=$NODEID+0x40000480
 PDOMapping=0
 
 [1807sub2]
@@ -1094,7 +1094,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1807sub6]
@@ -1127,7 +1127,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000180
+DefaultValue=$NODEID+0x40000180
 PDOMapping=0
 
 [1808sub2]
@@ -1163,7 +1163,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=10000
+DefaultValue=1000
 PDOMapping=0
 
 [1808sub6]
@@ -1196,7 +1196,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=0x40000280
+DefaultValue=$NODEID+0x40000280
 PDOMapping=0
 
 [1809sub2]
@@ -1232,7 +1232,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0006
 AccessType=rw
-DefaultValue=0
+DefaultValue=1000
 PDOMapping=0
 
 [1809sub6]
@@ -2120,7 +2120,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=
+DefaultValue=8
 PDOMapping=0
 
 [ManufacturerObjects]
