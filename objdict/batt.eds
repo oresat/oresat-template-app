@@ -8,8 +8,8 @@ Description=
 CreationTime=2:12PM
 CreationDate=12-06-2025
 CreatedBy=
-ModificationTime=12:55PM
-ModificationDate=12-12-2025
+ModificationTime=10:11AM
+ModificationDate=12-14-2025
 ModifiedBy=
 
 [DeviceInfo]
@@ -851,7 +851,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x40000180
+DefaultValue=$NODEID+0x40000181
 PDOMapping=0
 
 [1804sub2]
@@ -920,7 +920,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x40000280
+DefaultValue=$NODEID+0x40000281
 PDOMapping=0
 
 [1805sub2]
@@ -989,7 +989,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x40000380
+DefaultValue=$NODEID+0x40000381
 PDOMapping=0
 
 [1806sub2]
@@ -1058,7 +1058,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x40000480
+DefaultValue=$NODEID+0x40000481
 PDOMapping=0
 
 [1807sub2]
@@ -1127,7 +1127,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x40000180
+DefaultValue=$NODEID+0x40000182
 PDOMapping=0
 
 [1808sub2]
@@ -1196,7 +1196,7 @@ ObjectType=0x7
 ;StorageLocation=RAM
 DataType=0x0007
 AccessType=rw
-DefaultValue=$NODEID+0x40000280
+DefaultValue=$NODEID+0x40000282
 PDOMapping=0
 
 [1809sub2]
