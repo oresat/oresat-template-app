@@ -79,7 +79,7 @@ int main(void)
 		/* Further I/O or nonblocking application code may go here. */
 
 		/* Write outputs */
-		CO_process_TPDO(CO, syncWas, timeout);
+		CO_process_TPDO(CO, syncWas, timeout * 1000U);
 
 		reset = CO_process(CO, (uint16_t)elapsed, &timeout);
 		if (reset != CO_RESET_NOT) {
@@ -89,7 +89,7 @@ int main(void)
 		if (timeout > 0) {
 			board_sensors_fill_od();
 			k_sleep(K_MSEC(timeout));
-			elapsed = (uint32_t)k_uptime_delta;
+			elapsed = (uint32_t)k_uptime_delta(&timestamp);
 		} else {
 			elapsed = 0U;
 		}
