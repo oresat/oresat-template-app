@@ -92,9 +92,15 @@ static int handle_adc(void)
 		if ((vrefs_mv[i] == 0) && (channel_cfgs[i].reference == ADC_REF_INTERNAL)) {
 			vrefs_mv[i] = adc_ref_internal(adc);
 		}
+		#ifdef CONFIG_ADC_CONFIGURABLE_INPUTS
 		LOG_INF("Channel: %u, vref_mv: %u, gain: %u, acq time: %u, diff: %u, inp_pos: %u, inp_neg: %u",
-			   channel_cfgs[i].channel_id, vrefs_mv[i], channel_cfgs[i].gain, channel_cfgs[i].acquisition_time,
-			   channel_cfgs[i].differential, channel_cfgs[i].input_positive, channel_cfgs[i].input_negative);
+				channel_cfgs[i].channel_id, vrefs_mv[i], channel_cfgs[i].gain, channel_cfgs[i].acquisition_time,
+				channel_cfgs[i].differential, channel_cfgs[i].input_positive, channel_cfgs[i].input_negative);
+		#else
+		LOG_INF("Channel: %u, vref_mv: %u, gain: %u, acq time: %u, diff: %u",
+				channel_cfgs[i].channel_id, vrefs_mv[i], channel_cfgs[i].gain, channel_cfgs[i].acquisition_time,
+				channel_cfgs[i].differential);
+		#endif
 	}
 
 	while (1) {

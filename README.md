@@ -14,11 +14,17 @@ This template demonstrates the use of the following hardware modules:
 
 Supported boards contain Devicetree overlays in `boards/`. These overlays contain the `oresat_demo` label, which enables the demos in `Kconfig`. If a board does not have an overlay with the label, it will only log the messages found in `src/main.c`. Current supported boards are:
 - FRDM-MCXN947
-    - SCL: J7.8
-    - SDA: J7.6
-    - DAC: J1.4
+    - SCL:           J7.8
+    - SDA:           J7.6
+    - DAC:           J1.4
     - ADC channel 0: J4.8
     - ADC channel 1: J4.12
+- NUCLEO-R091RC
+    - SDA:      Arduino.D14  Morpho.PB9
+    - SCL:      Arduino.D15  Morpho.PB8
+    - DAC:      Arduino.A2   Morpho.PA4
+    - ADC1_IN0: Arduino.A0   Morpho.PA0
+    - ADC1_IN1: Arduino.A1   Morpho.PA1
 
 ---
 
