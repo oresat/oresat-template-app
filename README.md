@@ -1,5 +1,6 @@
 # Oresat Template App
 
+### Overview
 OreSat firmware project template using Zephyr RTOS.
 
 This template demonstrates the use of the following hardware modules:
@@ -11,6 +12,7 @@ This template demonstrates the use of the following hardware modules:
 *If no BME-280 is connected, the I2C demo will fail. The initial address transaction is still visible on an oscilloscope.*
 
 ---
+### Supported Boards
 
 Supported boards contain Devicetree overlays in `boards/`. These overlays contain the `oresat_demo` label, which enables the demos in `Kconfig`. If a board does not have an overlay with the label, it will only log the messages found in `src/main.c`. Current supported boards are:
 - FRDM-MCXN947
@@ -26,9 +28,18 @@ Supported boards contain Devicetree overlays in `boards/`. These overlays contai
     - ADC1_IN0: Arduino.A0   Morpho.PA0
     - ADC1_IN1: Arduino.A1   Morpho.PA1
 
----
 
-More information on building and running the application can be found in [Oresat MCXN947 Demo], from which this template originated.
+### Building
+|               |                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------- | 
+| FRDM-MCXN947  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 <PATH TO src/oresat/firmware/apps/template>` |
+| NUCLEO-R091RC | `west build -p always -b nucleo_f091rc <PATH TO src/oresat/firmware/apps/template>`             |  
+
+
+---
+### Other Information
+
+More information on the application and adding other boards can be found in [Oresat MCXN947 Demo], from which this template originated.
 
 Please follow the installation steps in [Oresat Zephyr Setup].
 
