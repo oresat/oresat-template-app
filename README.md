@@ -30,10 +30,11 @@ Supported boards contain Devicetree overlays in `boards/`. These overlays contai
 
 
 ### Building
-|               |                                                                                                 |
-| ------------- | ----------------------------------------------------------------------------------------------- | 
-| FRDM-MCXN947  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 <PATH TO src/oresat/firmware/apps/template>` |
-| NUCLEO-R091RC | `west build -p always -b nucleo_f091rc <PATH TO src/oresat/firmware/apps/template>`             |  
+Ensure you are in the `template` directory (`cd src/oresat/firmware/apps/template`) prior to building.
+|               |                                                       |
+| ------------- | ----------------------------------------------------- | 
+| FRDM-MCXN947  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 .` |
+| NUCLEO-R091RC | `west build -p always -b nucleo_f091rc .`             |  
 
 
 ---
