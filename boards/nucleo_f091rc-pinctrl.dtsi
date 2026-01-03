@@ -1,0 +1,27 @@
+&pinctrl {
+    i2c1_sda_pb9: i2c1_sda_pb9 {
+        pinmux = <STM32_PINMUX('B', 9, AF1)>; // SDA  Arduino: D14  Pin: PB9
+        slew-rate = "medium-speed";
+        bias-pull-up;
+        drive-open-drain;
+    };
+
+    i2c1_scl_pb8: i2c1_scl_pb8 {
+        pinmux = <STM32_PINMUX('B', 8, AF1)>; // SCL  Arduino: D15  Pin: PB8
+        slew-rate = "medium-speed";
+        bias-pull-up;
+        drive-open-drain;
+    };
+
+    dac1_out1_pa4: dac1_out1_pa4 {
+        pinmux = <STM32_PINMUX('A', 4, ANALOG)>; // DAC_OUT1  Arduino: A2  Pin: PA4
+    };
+
+    adc1_in0_pa0: adc1_in0_pa0 {
+        pinmux = <STM32_PINMUX('A', 0, ANALOG)>; // ADC1_IN0  Arduino: A0  Pin: PA0
+    };
+
+    adc1_in1_pa1: adc1_in1_pa1 {
+        pinmux = <STM32_PINMUX('A', 1, ANALOG)>; // ADC1_IN1  Arduino: A1  Pin: PA1
+    };
+};
