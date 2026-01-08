@@ -24,3 +24,11 @@ manifest:
       remote: zephyrproject-rtos
       revision: cf56b1d9c80f81a26e2ac5727c9cf177116a4692
       path: modules/debug/segger
+    - name: mcuboot
+      remote: zephyrproject-rtos
+      revision: 4eba8087fa606db801455f14d185255bc8c49467
+      path: modules/bootloader/mcuboot
+    - name: canopennode
+      remote: zephyrproject-rtos
+      revision: 53d3415c14d60f8f4bfca54bfbc5d5a667d7e724
+      path: modules/lib/canopennode

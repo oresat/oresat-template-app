@@ -6,7 +6,16 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(oresat_zephyr_template LANGUAGES C)
 
-target_sources(app PRIVATE src/main.c)
+# execute_process(COMMAND bash -c "oresat-configs canopennode od.yaml ../../common/od.yaml -d gen")
+
+target_sources(app PRIVATE
+  src/main.c
+  #gen/OD.c
+  od/CO_OD.c
+)
+
+#zephyr_include_directories(gen)
+zephyr_include_directories(od)
 
 # Compile in various demos depending on Kconfig values.
 target_sources_ifdef(CONFIG_BLINK_DEMO      app PRIVATE src/blink.c)
