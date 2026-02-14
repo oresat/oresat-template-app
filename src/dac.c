@@ -79,7 +79,7 @@ static int handle_dac(void)
 	 * DACs. For DACs with lower resolution, sleep time needs to
 	 * be increased.
 	 */
-	const int sleep_time = (4096 / dac_values > 0 ? 4096 / dac_values : 1) * 100;
+	const int sleep_time = ((4096 / dac_values) > 0 ? (4096 / dac_values) : 1) * 100;
 
 	LOG_DBG("Generating sawtooth signal at DAC channel %d.", DAC_CHANNEL_ID);
 	LOG_DBG("Number of DAC samples per cycle: %d, sleep time per sample (us): %d",

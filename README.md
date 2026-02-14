@@ -27,15 +27,35 @@ Supported boards contain Devicetree overlays in `boards/`. These overlays contai
     - DAC:      Arduino.A2   Morpho.PA4
     - ADC1_IN0: Arduino.A0   Morpho.PA0
     - ADC1_IN1: Arduino.A1   Morpho.PA1
-
+- NUCLEO-U545RE
+    - SDA:      Arduino.D14
+    - SCL:      Arduino.D15
+    - DAC:      Arduino.A2
+    - ADC1_IN0: Arduino.A0
+    - ADC1_IN1: Arduino.A1
 
 ### Building
 Ensure you are in the `template` directory (`cd src/oresat/firmware/apps/template`) prior to building.
 |               |                                                       |
-| ------------- | ----------------------------------------------------- | 
+| ------------- | ----------------------------------------------------- |
 | FRDM-MCXN947  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 .` |
-| NUCLEO-R091RC | `west build -p always -b nucleo_f091rc .`             |  
+| NUCLEO-R091RC | `west build -p always -b nucleo_f091rc .`             |
+| NUCLEO-U545RE | `west build -p always -b nucleo_u545re_q .`           |
 
+### Flashing
+Ensure you are in the `template` directory (`cd src/oresat/firmware/apps/template`) prior to flashing.
+|               |                         |
+| ------------- | ----------------------- |
+| OpenOCD       | `west flash -r openocd` |
+| PyOCD         | `west flash -r pyocd`   |
+
+**Note**: be sure to install the required pyocd packs for the board's SoC:
+`pyocd pack install NXP.MCXN947_DFP@25.09.00`
+`pyocd pack install stm32u5`
+
+**Note**: OpenOCD works with the one provided by Zephyr on the STM32F091, but not on the STM32U545. The latter might require you
+to install the custom version of OpenOCD developed by ST, which is distributed as part of their STM32CubeIDE. It is unknown for
+certain if this is correct. Accordingly, we recommend using pyocd to flash the STM32U545.
 
 ---
 ### Other Information

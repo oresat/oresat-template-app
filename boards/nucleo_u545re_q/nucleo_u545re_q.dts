@@ -1,0 +1,246 @@
+/*
+ * Copyright (c) 2025 STMicroelectronics
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <st/u5/stm32u545Xe.dtsi>
+#include <st/u5/stm32u545retxq-pinctrl.dtsi>
+#include "arduino_r3_connector.dtsi"
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+	model = "STMicroelectronics STM32U545RE-NUCLEO-Q board";
+	compatible = "st,stm32u545re-nucleo-q";
+
+	oresat_demo: oresat-demo-enabled {}; // Enable demos for supported boards
+
+	chosen {
+		zephyr,console = &usart1;
+		zephyr,shell-uart = &usart1;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+	};
+
+	leds: leds {
+		compatible = "gpio-leds";
+
+		green_led_2: led_2 {
+			gpios = <&gpioa 5 GPIO_ACTIVE_HIGH>;
+			label = "User LD4";
+		};
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+
+		user_button: button {
+			label = "User";
+			gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>;
+			zephyr,code = <INPUT_KEY_0>;
+		};
+	};
+
+	zephyr,user {
+		dac = <&dac1>;
+		dac_channel_id = <1>;
+		dac_resolution = <12>;
+	};
+
+	aliases {
+		dac0 = &dac1;
+		adc0 = &adc1;
+		i2c0 = &i2c1;
+		led0 = &green_led_2;
+		sw0 = &user_button;
+		watchdog0 = &iwdg;
+	};
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		/*
+		 * The following partitioning is dedicated to the use of nucleo_u545re_q
+		 * with TZEN=0 (i.e., without TF-M).
+		 * Place partitions within first 512 KiB to make use of the whole Bank1.
+		 */
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 DT_SIZE_K(64)>;
+		};
+
+		slot0_partition: partition@10000 {
+			label = "image-0";
+			reg = <0x00010000 DT_SIZE_K(192)>;
+		};
+
+		slot1_partition: partition@40000 {
+			label = "image-1";
+			reg = <0x00040000 DT_SIZE_K(192)>;
+		};
+
+		storage_partition: partition@70000 {
+			label = "storage";
+			reg = <0x00070000 DT_SIZE_K(64)>;
+		};
+	};
+};
+
+&usart1 {
+	pinctrl-0 = <&usart1_tx_pa9 &usart1_rx_pa10>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&usart3 {
+	pinctrl-0 = <&usart3_tx_pc10 &usart3_rx_pc11>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&lpuart1 {
+	pinctrl-0 = <&lpuart1_tx_pa2 &lpuart1_rx_pa3>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&clk_hsi {
+	status = "okay";
+};
+
+&clk_lse {
+	status = "okay";
+};
+
+&clk_msis {
+	status = "okay";
+	msi-pll-mode;
+	msi-range = <0>; /* 48MHz (reset value) */
+};
+
+&pll1 {
+	status = "okay";
+	clocks = <&clk_msis>; /* src */
+   div-m = <3>; /* 16 MHz max src freq */
+   mul-n = <10>; /* generate 160 MHz */
+   div-r = <1>;
+};
+
+&rcc {
+	clocks = <&pll1>;
+	clock-frequency = <DT_FREQ_M(160)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <1>;
+	apb2-prescaler = <1>;
+	apb3-prescaler = <1>;
+};
+
+&clk_lsi {
+	status = "okay";
+};
+
+&gpdma1 {
+	status = "okay";
+};
+
+&adc1 {
+	pinctrl-0 = <&adc1_in5_pa0 &adc1_in6_pa1>;
+	pinctrl-names = "default";
+	status = "okay";
+	st,adc-prescaler = < 0x4 >;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	#dma-cells = <1>;
+	dmas = <&gpdma1 1 0 (STM32_DMA_PERIPH_RX |
+						STM32_DMA_PRIORITY_HIGH |
+						STM32_DMA_PERIPH_16BITS |
+						STM32_DMA_MEM_16BITS)>;
+	dma-names = "adc1";
+
+	adc1_5: channel@5 {
+		reg = <5>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 391)>;
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <5>;
+		/delete-property/ zephyr,differential;
+	};
+	adc1_6: channel@6 {
+		reg = <6>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 391)>;
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <5>;
+		/delete-property/ zephyr,differential;
+	};
+};
+
+&dac1 {
+	status = "okay";
+	pinctrl-0 = <&dac1_out1_pa4>;
+	pinctrl-names = "default";
+};
+
+&i2c1 {
+	pinctrl-0 = <&i2c1_scl_pb6 &i2c1_sda_pb7>;
+	pinctrl-names = "default";
+	status = "okay";
+
+	bme280: bme280@77 {
+		compatible = "bosch,bme280";
+		reg = <0x77>;
+		status = "okay";
+	};
+};
+
+&i2c2 {
+	pinctrl-0 = <&i2c2_scl_pb13 &i2c2_sda_pb14>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&i2c3 {
+	pinctrl-0 = <&i2c3_scl_pa7 &i2c3_sda_pc1>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&rng {
+	status = "okay";
+};
+
+&spi3 {
+	pinctrl-0 = <&spi3_nss_pa15 &spi3_sck_pb3
+				&spi3_miso_pb4 &spi3_mosi_pb5>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&iwdg {
+	status = "okay";
+};
+
+&wwdg {
+	status = "okay";
+};
+
+&pwr {
+	wkup-pin@8 {
+		reg = <0x8>;
+		wkup-gpios = <&gpioa 7 STM32_PWR_WKUP_EVT_SRC_1>,
+					 <&gpiob 10 STM32_PWR_WKUP_EVT_SRC_2>;
+	};
+};
