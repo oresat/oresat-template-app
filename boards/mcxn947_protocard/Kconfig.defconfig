@@ -1,0 +1,14 @@
+# Copyright 2024 NXP
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_MCXN947_PROTOCARD
+
+if SD_STACK
+
+# SD stack requires larger main stack size
+config MAIN_STACK_SIZE
+	default 1536
+
+endif
+
+endif
