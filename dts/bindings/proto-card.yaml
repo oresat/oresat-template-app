@@ -1,0 +1,221 @@
+# Oresat proto card
+
+description: Oresat proto card
+
+compatible: "proto-card"
+
+properties:
+  tp84-p0-3-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp84-p0-3-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp85-p0-4-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp86-p0-5-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp78-p0-18-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp79-p0-19-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp80-p0-20-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp81-p0-21-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp82-p0-22-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp83-p0-23-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp68-p1-0-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp69-p1-1-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp70-p1-2-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp71-p1-3-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp72-p1-4-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp73-p1-5-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp74-p1-6-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp75-p1-7-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp5-p1-12-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp7-p1-14-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp8-p1-15-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp9-p2-0-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp10-p2-1-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp52-p3-1-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp60-p3-12-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp59-p3-13-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp58-p3-14-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp57-p3-15-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp56-p3-16-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp55-p3-17-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp62-p3-20-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp63-p3-21-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp29-p4-1-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp27-p4-3-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp26-p4-4-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp25-p4-5-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp22-p4-6-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp20-p4-7-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp41-p4-19-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp64-p5-0-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp65-p5-1-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp66-p5-2-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
+
+  tp67-p5-3-gpios:
+    type: phandle-array
+    required: true
+    description: GPIO input or output.
