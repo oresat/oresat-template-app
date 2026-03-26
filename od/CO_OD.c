@@ -61,10 +61,10 @@ struct sCO_OD_RAM CO_OD_RAM = {
 /*6200*/ {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 /*6401*/ {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 /*6411*/ {0, 0, 0, 0, 0, 0, 0, 0},
-/*1F50*/ {0x1, 0},
-/*1F51*/ {0x1, 0},
-/*1F56*/ {0x1, 0},
-/*1F57*/ {0x1, 0},
+/*1F50*/ {0},
+/*1F51*/ {0x0L},
+/*1F56*/ {0x0000L},
+/*1F57*/ {0x0000L},
 
            CO_OD_FIRST_LAST_WORD,
 };
@@ -279,18 +279,6 @@ struct sCO_OD_EEPROM CO_OD_EEPROM = {
            {(void*)&CO_OD_RAM.time.string[0], 0x06, 30},
            {(void*)&CO_OD_RAM.time.epochTimeBaseMs, 0x8E,  8},
            {(void*)&CO_OD_RAM.time.epochTimeOffsetMs, 0xBE,  4}};
-/*0x1F50*/ const CO_OD_entryRecord_t OD_record1F50[2] = {
-           {(void*)&CO_OD_RAM.program_data.maxSubIndex, 0x05,  1},
-           {(void*)&CO_OD_RAM.program_data.data,        0x0E,  0}};
-/*0x1F51*/ const CO_OD_entryRecord_t OD_record1F51[2] = {
-           {(void*)&CO_OD_RAM.program_control.maxSubIndex, 0x05,  1},
-           {(void*)&CO_OD_RAM.program_control.command,     0x3E,  1}};
-/*0x1F56*/ const CO_OD_entryRecord_t OD_record1F56[2] = {
-           {(void*)&CO_OD_RAM.program_software_id.maxSubIndex, 0x05,  1},
-           {(void*)&CO_OD_RAM.program_software_id.software_id, 0x06,  4}};
-/*0x1F57*/ const CO_OD_entryRecord_t OD_record1F57[2] = {
-           {(void*)&CO_OD_RAM.flash_status.maxSubIndex, 0x05,  1},
-           {(void*)&CO_OD_RAM.flash_status.status,      0x06,  4}};
 
 /*******************************************************************************
    OBJECT DICTIONARY
@@ -333,6 +321,10 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1A01, 0x08, 0x00,  0, (void*)&OD_record1A01},
 {0x1A02, 0x08, 0x00,  0, (void*)&OD_record1A02},
 {0x1A03, 0x08, 0x00,  0, (void*)&OD_record1A03},
+{0x1F50, 0x01, 0x0A,  0, (void*)0},
+{0x1F51, 0x01, 0x0E,  1, (void*)&CO_OD_RAM.program_control[0]},
+{0x1F56, 0x01, 0x86,  4, (void*)&CO_OD_RAM.program_software_id[0]},
+{0x1F57, 0x01, 0x86,  4, (void*)&CO_OD_RAM.flash_status[0]},
 {0x1F80, 0x00, 0x8D,  4, (void*)&CO_OD_ROM.NMTStartup},
 {0x2100, 0x00, 0x36, 10, (void*)&CO_OD_RAM.errorStatusBits[0]},
 {0x2101, 0x00, 0x0D,  1, (void*)&CO_OD_ROM.CANNodeID},
@@ -352,9 +344,5 @@ const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x6200, 0x08, 0x3E,  1, (void*)&CO_OD_RAM.writeOutput8Bit[0]},
 {0x6401, 0x0C, 0xB6,  2, (void*)&CO_OD_RAM.readAnalogueInput16Bit[0]},
 {0x6411, 0x08, 0xBE,  2, (void*)&CO_OD_RAM.writeAnalogueOutput16Bit[0]},
-{0x1F50, 0x01, 0x00,  0, (void*)&OD_record1F50},
-{0x1F51, 0x01, 0x00,  0, (void*)&OD_record1F51},
-{0x1F56, 0x01, 0x00,  0, (void*)&OD_record1F56},
-{0x1F57, 0x01, 0x00,  0, (void*)&OD_record1F57},
 };
 

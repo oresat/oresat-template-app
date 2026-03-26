@@ -179,26 +179,6 @@
                UNSIGNED64     epochTimeBaseMs;
                UNSIGNED32     epochTimeOffsetMs;
                }              OD_time_t;
-               
-/*1F50      */ typedef struct{
-               UNSIGNED8      maxSubIndex;
-               DOMAIN         data;
-               }              OD_program_data_t;
-
-/*1F51      */ typedef struct{
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED8      command;
-               }              OD_program_control_t;
-
-/*1F56      */ typedef struct{
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     software_id;
-               }              OD_program_software_id_t;
-
-/*1F57      */ typedef struct{
-               UNSIGNED8      maxSubIndex;
-               UNSIGNED32     status;
-               }              OD_flash_status_t;
 
 /*******************************************************************************
    STRUCTURES FOR VARIABLES IN DIFFERENT MEMORY LOCATIONS
@@ -227,10 +207,10 @@ struct sCO_OD_RAM{
 /*6200      */ UNSIGNED8      writeOutput8Bit[8];
 /*6401      */ INTEGER16      readAnalogueInput16Bit[12];
 /*6411      */ INTEGER16      writeAnalogueOutput16Bit[8];
-/*1F50      */ OD_program_data_t        program_data;
-/*1F51      */ OD_program_control_t     program_control;
-/*1F56      */ OD_program_software_id_t program_software_id;
-/*1F57      */ OD_flash_status_t        flash_status;
+/*1F50      */ DOMAIN         program_data[1];
+/*1F51      */ UNSIGNED8      program_control[1];
+/*1F56      */ UNSIGNED32     program_software_id[1];
+/*1F57      */ UNSIGNED32     flash_status[1];
 
                UNSIGNED32     LastWord;
 };
@@ -456,17 +436,25 @@ extern struct sCO_OD_ROM CO_OD_ROM;
       #define OD_writeAnalogueOutput16Bit                CO_OD_RAM.writeAnalogueOutput16Bit
       #define ODL_writeAnalogueOutput16Bit_arrayLength   8
 
-/*1F50, Data Type: OD_program_data_t */
-      #define OD_program_data                           CO_OD_RAM.program_data
+/*1F50, Data Type: DOMAIN, Array[1] */
+#define OD_program_data                           CO_OD_RAM.program_data
+#define ODL_program_data_arrayLength              1
+#define ODA_program_data_programData              0
 
-/*1F51, Data Type: OD_program_control_t */
-      #define OD_program_control                        CO_OD_RAM.program_control
+/*1F51, Data Type: UNSIGNED8, Array[1] */
+#define OD_program_control                        CO_OD_RAM.program_control
+#define ODL_program_control_arrayLength           1
+#define ODA_program_control_programControl        0
 
-/*1F56, Data Type: OD_program_software_id_t */
-      #define OD_program_software_id                    CO_OD_RAM.program_software_id
+/*1F56, Data Type: UNSIGNED32, Array[1] */
+#define OD_program_software_id                    CO_OD_RAM.program_software_id
+#define ODL_program_software_id_arrayLength       1
+#define ODA_program_software_id_programSoftwareIdentification 0
 
-/*1F57, Data Type: OD_flash_status_t */
-      #define OD_flash_status                           CO_OD_RAM.flash_status
+/*1F57, Data Type: UNSIGNED32, Array[1] */
+#define OD_flash_status                           CO_OD_RAM.flash_status
+#define ODL_flash_status_arrayLength              1
+#define ODA_flash_status_flashStatusIdentification 0
 
 #endif
 

@@ -33,45 +33,66 @@ LOG_MODULE_REGISTER(oresat_zephyr_template, LOG_LEVEL_DBG);
 
 int main(void)
 {
-    //const uint8_t node_id = oresat_get_node_id();
+    CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
+    CO_ReturnError_t err;
+    struct canopen_context can = {
+        .dev = CAN_INTERFACE,
+    };
+
+    uint16_t timeout;
+    uint32_t elapsed;
+    int64_t timestamp;
     const uint8_t node_id = 0x2A;
 
     LOG_INF("Oresat template starting on board: %s", CONFIG_BOARD_TARGET);
     LOG_INF("Starting CANopenNode (node_id=%u, bitrate=%u kbps)",
-        (unsigned)node_id, (unsigned)CAN_BITRATE);
+            (unsigned)node_id, (unsigned)CAN_BITRATE);
 
-    if (!device_is_ready(CAN_INTERFACE)) {
+    if (!device_is_ready(can.dev)) {
         LOG_ERR("CAN device not ready");
         return 0;
     }
 
-    //canopennode_init(CAN_INTERFACE, CAN_BITRATE, node_id);
-    CO_ReturnError_t err = CO_init((void *)CAN_INTERFACE, node_id, CAN_BITRATE);
-    if (err != CO_ERROR_NO) { ; }
+    while (reset != CO_RESET_APP) {
+        elapsed = 0;
 
-    //canopen_program_download_attach(CO->NMT, CO->SDOserver, CO->em);
-    canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
-
-    printk("Template app running. Waiting for CANopen requests...\r\n");
-
-    //while (canopennode_is_running()) {
-    //    k_sleep(K_MSEC(1000));
-    //}
-    uint16_t next_ms = 50;
-    while (1) {
-        CO_NMT_reset_cmd_t r = CO_process(CO, 1, &next_ms);
-        if (r != CO_RESET_NOT) {
-            break;
+        err = CO_init(&can, node_id, CAN_BITRATE);
+        if (err != CO_ERROR_NO) {
+            LOG_ERR("CO_init failed: %d", err);
+            return 0;
         }
-        k_sleep(K_MSEC(1));
+
+        canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
+
+        CO_CANsetNormalMode(CO->CANmodule[0]);
+
+        printk("Template app running. Waiting for CANopen requests...\r\n");
+
+        while (true) {
+            timeout = 1;
+            timestamp = k_uptime_get();
+
+            reset = CO_process(CO, (uint16_t)elapsed, &timeout);
+            if (reset != CO_RESET_NOT) {
+                break;
+            }
+
+            if (timeout > 0) {
+                k_sleep(K_MSEC(timeout));
+                elapsed = (uint32_t)k_uptime_delta(&timestamp);
+            } else {
+                elapsed = 0;
+            }
+        }
+
+        if (reset == CO_RESET_COMM) {
+            LOG_INF("Resetting communication");
+        }
     }
 
-    LOG_WRN("CANopenNode stopped; rebooting");
-    //canopennode_stop(CAN_INTERFACE);
-    CO_delete((void *)CAN_INTERFACE);
+    LOG_WRN("CANopenNode stopped. Rebooting");
+    CO_delete(&can);
     sys_reboot(SYS_REBOOT_COLD);
 
     return 0;
 }
-
-
