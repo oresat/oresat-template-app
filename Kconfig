@@ -24,18 +24,38 @@ if BOARD_OVERLAY_PRESENT
     config I2C_SENSOR_DEMO
         bool "Enable monitoring an I2C sensor"
         default y
+        select I2C
+        select SENSOR
+        select SENSOR_ASYNC_API
         help
         Enable reading from a Bosch Sensortec BME280.
 
     config DAC_DEMO
         bool "Enable generation of a sawtooth pattern."
         default y
+        select DAC
         help
         Enable a slowly repeating sawtooth from 0 to 3.3v.
+
+    config CAN_DEMO
+        bool "Enable sending CAN packets."
+        default y
+        select CAN
+        select CANOPENNODE
+	select USE_STM32_HAL_FLASH if SOC_STM32F091XC
+	select USE_STM32_HAL_FLASH_EX if SOC_STM32F091XC
+	select USE_STM32_HAL_CAN if SOC_STM32F091XC
+        help
+        Enable CAN interface and send data from CO_OD.
 
     config ADC_DEMO
         bool "Enable monitoring one or more ADC channels."
         default y
+        select ADC
+        select DMA
+        select ADC_STM32 if SOC_STM32F091XC
+        select ADC_STM32_DMA if SOC_STM32F091XC
+        select DMA_STM32 if SOC_STM32F091XC
         help
         Outputs the data scaled to mV.
 
