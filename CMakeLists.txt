@@ -26,6 +26,7 @@ target_sources_ifdef(CONFIG_I2C_SENSOR_DEMO app PRIVATE src/i2c_sensor.c)
 target_sources_ifdef(CONFIG_DAC_DEMO        app PRIVATE src/dac.c)
 target_sources_ifdef(CONFIG_ADC_DEMO        app PRIVATE src/adc.c)
 target_sources_ifdef(CONFIG_CAN_DEMO        app PRIVATE src/can.c objdict/CO_OD.c)
+target_sources_ifdef(CONFIG_GPIO_DEMO       app PRIVATE src/gpio.c)
 
 zephyr_include_directories(objdict)
 
