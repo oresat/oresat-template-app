@@ -7,7 +7,7 @@ import canopen
 
 SERIAL_PORT = "/dev/cu.usbmodem1101"
 CHANNEL = SERIAL_PORT
-BITRATE = 100_000
+BITRATE = 1_000_000
 NODE_ID = 0x2A
 BIN_PATH = Path("build-sysbuild/template/zephyr/zephyr.signed.bin")
 
