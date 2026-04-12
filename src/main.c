@@ -25,74 +25,9 @@
 
 LOG_MODULE_REGISTER(oresat_zephyr_template, LOG_LEVEL_DBG);
 
-#define CAN_INTERFACE (DEVICE_DT_GET(DT_CHOSEN(zephyr_canbus)))
-#define CAN_BITRATE                                                                        \
-    (DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bitrate,                                         \
-     DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bus_speed, CONFIG_CAN_DEFAULT_BITRATE)         / \
-     1000))
-
 int main(void)
 {
-    CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
-    CO_ReturnError_t err;
-    struct canopen_context can = {
-        .dev = CAN_INTERFACE,
-    };
-
-    uint16_t timeout;
-    uint32_t elapsed;
-    int64_t timestamp;
-    const uint8_t node_id = 0x2A;
-
     LOG_INF("Oresat template starting on board: %s", CONFIG_BOARD_TARGET);
-    LOG_INF("Starting CANopenNode (node_id=%u, bitrate=%u kbps)",
-            (unsigned)node_id, (unsigned)CAN_BITRATE);
-
-    if (!device_is_ready(can.dev)) {
-        LOG_ERR("CAN device not ready");
-        return 0;
-    }
-
-    while (reset != CO_RESET_APP) {
-        elapsed = 0;
-
-        err = CO_init(&can, node_id, CAN_BITRATE);
-        if (err != CO_ERROR_NO) {
-            LOG_ERR("CO_init failed: %d", err);
-            return 0;
-        }
-
-        canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
-
-        CO_CANsetNormalMode(CO->CANmodule[0]);
-
-        printk("Template app running. Waiting for CANopen requests...\r\n");
-
-        while (true) {
-            timeout = 1;
-            timestamp = k_uptime_get();
-
-            reset = CO_process(CO, (uint16_t)elapsed, &timeout);
-            if (reset != CO_RESET_NOT) {
-                break;
-            }
-
-            if (timeout > 0) {
-                k_sleep(K_MSEC(timeout));
-                elapsed = (uint32_t)k_uptime_delta(&timestamp);
-            } else {
-                elapsed = 0;
-            }
-        }
-
-        if (reset == CO_RESET_COMM) {
-            LOG_INF("Resetting communication");
-        }
-    }
-
-    LOG_WRN("CANopenNode stopped. Rebooting");
-    CO_delete(&can);
-    sys_reboot(SYS_REBOOT_COLD);
 
     return 0;
 }

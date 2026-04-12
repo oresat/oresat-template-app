@@ -14,7 +14,6 @@ project(oresat_zephyr_template LANGUAGES C)
 target_sources(app PRIVATE
   src/main.c
   #gen/OD.c
-  od/CO_OD.c
 )
 
 #zephyr_include_directories(gen)

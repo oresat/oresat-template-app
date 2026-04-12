@@ -14,7 +14,7 @@ LOG_MODULE_REGISTER(can_thread, LOG_LEVEL_DBG);
 #define CAN_INTERFACE (DEVICE_DT_GET(DT_CHOSEN(zephyr_canbus)))
 #define CAN_BITRATE (DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bitrate, \
 					 DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bus_speed, \
-					            CONFIG_CAN_DEFAULT_BITRATE) / 1000))
+								CONFIG_CAN_DEFAULT_BITRATE) / 1000))
 
 #define CAN_THREAD_STACK_SIZE 2048
 #define CAN_THREAD_PRIORITY 0
@@ -48,10 +48,13 @@ static void handle_can(void *p1, void *p2, void *p3)
 		k_msleep(1000);
 		__ASSERT(false, "Fatal error");
 	}
-	LOG_INF("CANopen stack initialized for node %u", node_id);
+	LOG_INF("Starting CANopenNode (node_id=%u, bitrate=%u kbps)",
+			(unsigned)node_id, (unsigned)CAN_BITRATE);
 
+	canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
 	CO_CANsetNormalMode(CO->CANmodule[0]);
 
+	LOG_INF("Template app running. Waiting for CANopen requests...");
 	while (true) {
 		bool_t syncWas = false;
 
@@ -75,10 +78,90 @@ static void handle_can(void *p1, void *p2, void *p3)
 		} else {
 			elapsed = 0U;
 		}
+
+		if (reset == CO_RESET_COMM) {
+			LOG_INF("Resetting communication");
+		}
 	}
 
 	CO_delete(&can);
-	__ASSERT(false, "Fatal error");
+	sys_reboot(SYS_REBOOT_COLD);
 }
+
+
+#if 0
+
+#define CAN_INTERFACE (DEVICE_DT_GET(DT_CHOSEN(zephyr_canbus)))
+#define CAN_BITRATE 																	   \
+	(DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bitrate,  									   \
+	 DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bus_speed, CONFIG_CAN_DEFAULT_BITRATE)		 / \
+	 1000))
+
+
+int do_can(void)
+{
+	uint16_t timeout;
+	uint32_t elapsed;
+	int64_t timestamp;
+	const uint8_t node_id = 0x2A;
+	CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
+	CO_ReturnError_t err;
+	struct canopen_context can = {
+		.dev = CAN_INTERFACE,
+	};
+
+	LOG_INF("Starting CANopenNode (node_id=%u, bitrate=%u kbps)",
+			(unsigned)node_id, (unsigned)CAN_BITRATE);
+
+	if (!device_is_ready(can.dev)) {
+		LOG_ERR("CAN device not ready");
+		return 0;
+	}
+
+	while (reset != CO_RESET_APP) {
+		elapsed = 0;
+
+		err = CO_init(&can, node_id, CAN_BITRATE);
+		if (err != CO_ERROR_NO) {
+			LOG_ERR("CO_init failed: %d", err);
+			return 0;
+		}
+
+		canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
+
+		CO_CANsetNormalMode(CO->CANmodule[0]);
+
+		printk("Template app running. Waiting for CANopen requests...\r\n");
+
+		while (true) {
+			timeout = 1;
+			timestamp = k_uptime_get();
+
+			reset = CO_process(CO, (uint16_t)elapsed, &timeout);
+			if (reset != CO_RESET_NOT) {
+				break;
+			}
+
+			if (timeout > 0) {
+				k_sleep(K_MSEC(timeout));
+				elapsed = (uint32_t)k_uptime_delta(&timestamp);
+			} else {
+				elapsed = 0;
+			}
+		}
+
+		if (reset == CO_RESET_COMM) {
+			LOG_INF("Resetting communication");
+		}
+	}
+
+	LOG_WRN("CANopenNode stopped. Rebooting");
+	CO_delete(&can);
+	sys_reboot(SYS_REBOOT_COLD);
+	return 0;
+}
+#endif
+
+
 
 K_THREAD_DEFINE(can_id, CAN_THREAD_STACK_SIZE, handle_can, NULL, NULL, NULL, CAN_THREAD_PRIORITY, 0, 0);
