@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import time
@@ -5,19 +6,19 @@ from pathlib import Path
 
 import canopen
 
-SERIAL_PORT = "/dev/cu.usbmodem1101"
-CHANNEL = SERIAL_PORT
-BITRATE = 100_000
-NODE_ID = 0x2A
-BIN_PATH = Path("build-sysbuild/template/zephyr/zephyr.signed.bin")
+DEFAULT_SERIAL_PORT = "/dev/cu.usbmodem101"
+DEFAULT_CHANNEL = DEFAULT_SERIAL_PORT
+DEFAULT_BITRATE = 1_000_000
+DEFAULT_NODE_ID = 0x2A
+DEFAULT_BIN_PATH = Path("build-sysbuild/template/zephyr/zephyr.signed.bin")
 
-BLOCK_TRANSFER = False
-DOWNLOAD_BUFFER_SIZE = 1024
-STATUS_TIMEOUT_S = 30.0
-BOOTUP_TIMEOUT_S = 20.0
-SDO_TIMEOUT_S = 1.0
-SDO_RETRIES = 1
-CONFIRM_IMAGE = True
+DEFAULT_BLOCK_TRANSFER = False
+DEFAULT_DOWNLOAD_BUFFER_SIZE = 889
+DEFAULT_STATUS_TIMEOUT_S = 30.0
+DEFAULT_BOOTUP_TIMEOUT_S = 20.0
+DEFAULT_SDO_TIMEOUT_S = 3.0
+DEFAULT_SDO_RETRIES = 3
+DEFAULT_CONFIRM_IMAGE = True
 
 H1F50_PROGRAM_DATA = 0x1F50
 H1F51_PROGRAM_CTRL = 0x1F51
@@ -28,6 +29,32 @@ PROGRAM_CTRL_STOP = 0x00
 PROGRAM_CTRL_START = 0x01
 PROGRAM_CTRL_CLEAR = 0x03
 PROGRAM_CTRL_ZEPHYR_CONFIRM = 0x80
+
+
+def parse_args():
+    p = argparse.ArgumentParser()
+
+    p.add_argument("--serial-port", default=DEFAULT_SERIAL_PORT)
+    p.add_argument("--channel", default=None)
+    p.add_argument("--bitrate", type=int, default=DEFAULT_BITRATE)
+    p.add_argument("--node-id", type=parse_int, default=DEFAULT_NODE_ID)
+    p.add_argument("--bin", dest="bin_path", type=Path, default=DEFAULT_BIN_PATH)
+
+    p.add_argument("--block-transfer", action="store_true", default=DEFAULT_BLOCK_TRANSFER)
+    p.add_argument("--download-buffer-size", type=int, default=DEFAULT_DOWNLOAD_BUFFER_SIZE)
+    p.add_argument("--status-timeout", type=float, default=DEFAULT_STATUS_TIMEOUT_S)
+    p.add_argument("--bootup-timeout", type=float, default=DEFAULT_BOOTUP_TIMEOUT_S)
+    p.add_argument("--sdo-timeout", type=float, default=DEFAULT_SDO_TIMEOUT_S)
+    p.add_argument("--sdo-retries", type=int, default=DEFAULT_SDO_RETRIES)
+
+    p.add_argument("--confirm", dest="confirm_image", action="store_true", default=DEFAULT_CONFIRM_IMAGE)
+    p.add_argument("--no-confirm", dest="confirm_image", action="store_false")
+
+    return p.parse_args()
+
+
+def parse_int(s):
+    return int(s, 0)
 
 
 def create_object_dictionary():
@@ -72,18 +99,23 @@ def wait_flash_status_ok(flash_sdo, timeout_s):
 
 
 def main():
-    if not BIN_PATH.is_file():
-        print(f"Binary not found: {BIN_PATH}")
+    args = parse_args()
+
+    channel = args.channel or args.serial_port
+    bin_path = args.bin_path
+
+    if not bin_path.is_file():
+        print(f"Binary not found: {bin_path}")
         return 1
 
-    size = os.path.getsize(BIN_PATH)
+    size = os.path.getsize(bin_path)
 
     network = canopen.Network()
-    network.connect(interface="slcan", channel=CHANNEL, bitrate=BITRATE)
+    network.connect(interface="slcan", channel=channel, bitrate=args.bitrate)
 
-    node = network.add_node(NODE_ID, create_object_dictionary())
-    node.sdo.MAX_RETRIES = SDO_RETRIES
-    node.sdo.RESPONSE_TIMEOUT = SDO_TIMEOUT_S
+    node = network.add_node(args.node_id, create_object_dictionary())
+    node.sdo.MAX_RETRIES = args.sdo_retries
+    node.sdo.RESPONSE_TIMEOUT = args.sdo_timeout
 
     data_sdo = node.sdo[H1F50_PROGRAM_DATA][1]
     ctrl_sdo = node.sdo[H1F51_PROGRAM_CTRL][1]
@@ -98,22 +130,22 @@ def main():
     ctrl_sdo.raw = PROGRAM_CTRL_STOP
     ctrl_sdo.raw = PROGRAM_CTRL_CLEAR
 
-    status = wait_flash_status_ok(flash_sdo, STATUS_TIMEOUT_S)
+    status = wait_flash_status_ok(flash_sdo, args.status_timeout)
     if status != 0:
         print(f"CLEAR failed, flash status=0x{status:08X}")
         network.disconnect()
         return 2
 
-    infile = open(BIN_PATH, "rb")
+    infile = open(bin_path, "rb")
     outfile = data_sdo.open(
         "wb",
-        buffering=DOWNLOAD_BUFFER_SIZE,
+        buffering=args.download_buffer_size,
         size=size,
-        block_transfer=BLOCK_TRANSFER,
+        block_transfer=args.block_transfer
     )
 
     while True:
-        chunk = infile.read(DOWNLOAD_BUFFER_SIZE // 2)
+        chunk = infile.read(args.download_buffer_size // 2)
         if not chunk:
             break
         outfile.write(chunk)
@@ -121,7 +153,7 @@ def main():
     infile.close()
     outfile.close()
 
-    status = wait_flash_status_ok(flash_sdo, STATUS_TIMEOUT_S)
+    status = wait_flash_status_ok(flash_sdo, args.status_timeout)
     if status != 0:
         print(f"Download failed, flash status=0x{status:08X}")
         network.disconnect()
@@ -130,11 +162,11 @@ def main():
     print(f"Software ID after download: 0x{int(swid_sdo.raw):08X}")
 
     ctrl_sdo.raw = PROGRAM_CTRL_START
-    node.nmt.wait_for_bootup(timeout=BOOTUP_TIMEOUT_S)
+    node.nmt.wait_for_bootup(timeout=args.bootup_timeout)
 
     print(f"Software ID after reboot: 0x{int(swid_sdo.raw):08X}")
 
-    if CONFIRM_IMAGE:
+    if args.confirm_image:
         node.nmt.state = "PRE-OPERATIONAL"
         time.sleep(0.5)
         ctrl_sdo.raw = PROGRAM_CTRL_ZEPHYR_CONFIRM
