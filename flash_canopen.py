@@ -5,11 +5,11 @@ from pathlib import Path
 
 import canopen
 
-SERIAL_PORT = "/dev/cu.usbmodem1101"
+SERIAL_PORT = "/dev/ttyACM2"
 CHANNEL = SERIAL_PORT
 BITRATE = 1_000_000
 NODE_ID = 0x2A
-BIN_PATH = Path("build-sysbuild/template/zephyr/zephyr.signed.bin")
+BIN_PATH = Path("build/template/zephyr/zephyr.signed.bin")
 
 BLOCK_TRANSFER = False
 DOWNLOAD_BUFFER_SIZE = 1024
