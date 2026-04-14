@@ -113,9 +113,9 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
 
 
 /*0x1200*/ const CO_OD_entryRecord_t OD_record1200[3] = {
-           {(void*)&CO_OD_RAM.SDOServerParameter[0].highestSubIndexSupported, 0x06, 0x1 },
-           {(void*)&CO_OD_RAM.SDOServerParameter[0].COB_IDClientToServer, 0xA6, 0x4 },
-           {(void*)&CO_OD_RAM.SDOServerParameter[0].COB_IDServerToClient, 0xA6, 0x4 },
+           {(void*)&CO_OD_RAM.SDOServerParameter[0].highestSubIndexSupported, 0x05, 0x1 },
+           {(void*)&CO_OD_RAM.SDOServerParameter[0].COB_IDClientToServer, 0x85, 0x4 },
+           {(void*)&CO_OD_RAM.SDOServerParameter[0].COB_IDServerToClient, 0x85, 0x4 },
 };
 
 /*0x1400*/ const CO_OD_entryRecord_t OD_record1400[3] = {
