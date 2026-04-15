@@ -24,6 +24,7 @@ static void handle_can(void *p1, void *p2, void *p3)
 {
 	int err;
 	uint16_t timeout;
+	uint16_t wr_timeout_count;
 	uint32_t elapsed = 0U;
 	int64_t timestamp;
 	CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
@@ -42,45 +43,72 @@ static void handle_can(void *p1, void *p2, void *p3)
 		k_msleep(1000);
 		__ASSERT(false, "Fatal error");
 	}
-	err = CO_init(&can, node_id, CAN_BITRATE);
-	if (err != CO_ERROR_NO) {
-		LOG_ERR("CO_init failed (err = %d)", err);
-		k_msleep(1000);
-		__ASSERT(false, "Fatal error");
-	}
+
 	LOG_INF("Starting CANopenNode (node_id=%u, bitrate=%u kbps)",
 			(unsigned)node_id, (unsigned)CAN_BITRATE);
 
-	canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
-	CO_CANsetNormalMode(CO->CANmodule[0]);
+	while (reset != CO_RESET_APP) {
+		elapsed = 0U;
+		wr_timeout_count = 0U;
 
-	LOG_INF("Template app running. Waiting for CANopen requests...");
-	while (true) {
-		bool_t syncWas = false;
-
-		timeout = 1000U;
-		timestamp = k_uptime_get();
-
-		/* Read inputs */
-		CO_process_RPDO(CO, syncWas);
-
-		/* Write outputs */
-		CO_process_TPDO(CO, syncWas, timeout * 1000U);
-
-		reset = CO_process(CO, (uint16_t)elapsed, &timeout);
-		if (reset != CO_RESET_NOT) {
-			break;
+		err = CO_init(&can, node_id, CAN_BITRATE);
+		if (err != CO_ERROR_NO) {
+			LOG_ERR("CO_init failed (err = %d)", err);
+			k_msleep(1000);
+			__ASSERT(false, "Fatal error");
 		}
 
-		if (timeout > 0) {
-			k_sleep(K_MSEC(timeout));
-			elapsed = (uint32_t)k_uptime_delta(&timestamp);
-		} else {
-			elapsed = 0U;
-		}
+		canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
+		CO_CANsetNormalMode(CO->CANmodule[0]);
 
-		if (reset == CO_RESET_COMM) {
-			LOG_INF("Resetting communication");
+		LOG_INF("Template app running. Waiting for CANopen requests...");
+
+		while (true) {
+			bool_t syncWas = false;
+
+			timeout = 1U;
+			timestamp = k_uptime_get();
+
+			if (wr_timeout_count++ >= 1000U) {
+				wr_timeout_count = 0U;
+
+				CO_LOCK_OD();
+				CO_OD_RAM.pack_1.cycles++;
+				CO_OD_RAM.pack_1.current = 100;
+				CO_OD_RAM.pack_1.full_capacity = 1000;
+				CO_OD_RAM.pack_1.status = 13;
+				CO_OD_RAM.pack_1.temperature = 21;
+				CO_OD_RAM.pack_1.vbatt = 79;
+				CO_OD_RAM.pack_2.cycles++;
+				CO_OD_RAM.pack_2.current = 200;
+				CO_OD_RAM.pack_2.full_capacity = 1500;
+				CO_OD_RAM.pack_2.status = 17;
+				CO_OD_RAM.pack_2.temperature = 23;
+				CO_OD_RAM.pack_2.vbatt = 84;
+				CO_UNLOCK_OD();
+
+				/* Read inputs */
+				CO_process_RPDO(CO, syncWas);
+
+				/* Write outputs */
+				CO_process_TPDO(CO, syncWas, timeout * 1000U * 1000U);
+			}
+
+			reset = CO_process(CO, (uint16_t)elapsed, &timeout);
+			if (reset != CO_RESET_NOT) {
+				break;
+			}
+
+			if (timeout > 0) {
+				k_sleep(K_MSEC(timeout));
+				elapsed = (uint32_t)k_uptime_delta(&timestamp);
+			} else {
+				elapsed = 0U;
+			}
+
+			if (reset == CO_RESET_COMM) {
+				LOG_INF("Resetting communication");
+			}
 		}
 	}
 
