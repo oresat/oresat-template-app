@@ -144,11 +144,17 @@ def main():
         block_transfer=args.block_transfer
     )
 
+    sent = 0
     while True:
         chunk = infile.read(args.download_buffer_size // 2)
         if not chunk:
             break
         outfile.write(chunk)
+        sent = sent + args.download_buffer_size // 2
+        if sent > size:
+            sent = size;
+        percent = 100.0 * sent / size
+        print(f"{percent:.1f}%", end='\r')
 
     infile.close()
     outfile.close()
