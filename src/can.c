@@ -4,6 +4,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/dfu/mcuboot.h>
 #include <canopennode.h>
 #include <CO_OD.h>
 #include <board_sensors.h>
@@ -20,6 +21,16 @@ LOG_MODULE_REGISTER(can_thread, LOG_LEVEL_DBG);
 #define CAN_THREAD_PRIORITY 0
 extern const k_tid_t can_id;
 
+static bool run_self_tests(void)
+{
+	LOG_INF("Running system self-tests...");
+
+	// Placeholder for board/app-specific checks
+	bool tests_passed = true;
+
+	return tests_passed;
+}
+
 static void handle_can(void *p1, void *p2, void *p3)
 {
 	int err;
@@ -34,6 +45,25 @@ static void handle_can(void *p1, void *p2, void *p3)
 	k_thread_name_set(can_id, "can_thread");
 
 	LOG_INF("Starting CAN thread");
+
+	// Confirm a newly booted MCUboot image if self-tests pass
+	if (!boot_is_img_confirmed()) {
+		LOG_INF("New firmware detected. Pending confirmation.");
+
+		if (run_self_tests()) {
+			LOG_INF("Self-tests passed. Confirming image.");
+			int rc = boot_write_img_confirmed();
+			if (rc < 0) {
+				LOG_ERR("Failed to confirm MCUboot image: %d", rc);
+			}
+		} else {
+			LOG_ERR("Self-tests failed. Rebooting to revert firmware...");
+			k_msleep(500); // Let logs flush
+			sys_reboot(SYS_REBOOT_COLD);
+		}
+	} else {
+		LOG_INF("Firmware already confirmed.");
+	}
 
 	oresat_fix_pdo_cob_ids(node_id);
 
@@ -125,6 +155,15 @@ static void handle_can(void *p1, void *p2, void *p3)
 	 DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bus_speed, CONFIG_CAN_DEFAULT_BITRATE)		 / \
 	 1000))
 
+static bool run_self_tests(void)
+{
+	LOG_INF("Running system self-tests...");
+
+	// Placeholder for board/app-specific checks
+	bool tests_passed = true;
+
+	return tests_passed;
+}
 
 int do_can(void)
 {
@@ -137,6 +176,25 @@ int do_can(void)
 	struct canopen_context can = {
 		.dev = CAN_INTERFACE,
 	};
+
+	// Confirm a newly booted MCUboot image if self-tests pass
+	if (!boot_is_img_confirmed()) {
+		LOG_INF("New firmware detected. Pending confirmation.");
+
+		if (run_self_tests()) {
+			LOG_INF("Self-tests passed. Confirming image.");
+			int rc = boot_write_img_confirmed();
+			if (rc < 0) {
+				LOG_ERR("Failed to confirm MCUboot image: %d", rc);
+			}
+		} else {
+			LOG_ERR("Self-tests failed. Rebooting to revert firmware...");
+			k_msleep(500); // Let logs flush
+			sys_reboot(SYS_REBOOT_COLD);
+		}
+	} else {
+		LOG_INF("Firmware already confirmed.");
+	}
 
 	LOG_INF("Starting CANopenNode (node_id=%u, bitrate=%u kbps)",
 			(unsigned)node_id, (unsigned)CAN_BITRATE);
@@ -161,6 +219,7 @@ int do_can(void)
 
 		printk("Template app running. Waiting for CANopen requests...\r\n");
 
+		// Main CANopen processing loop
 		while (true) {
 			timeout = 1;
 			timestamp = k_uptime_get();
@@ -188,6 +247,7 @@ int do_can(void)
 	sys_reboot(SYS_REBOOT_COLD);
 	return 0;
 }
+
 #endif
 
 
