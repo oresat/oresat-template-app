@@ -31,6 +31,16 @@ LOG_MODULE_REGISTER(oresat_zephyr_template, LOG_LEVEL_DBG);
      DT_PROP_OR(DT_CHOSEN(zephyr_canbus), bus_speed, CONFIG_CAN_DEFAULT_BITRATE)         / \
      1000))
 
+static bool run_self_tests(void)
+{
+    LOG_INF("Running system self-tests...");
+    
+    // Placeholder for board/app-specific checks
+    bool tests_passed = true; 
+
+    return tests_passed;
+}
+
 int main(void)
 {
     CO_NMT_reset_cmd_t reset = CO_RESET_NOT;
@@ -45,6 +55,26 @@ int main(void)
     const uint8_t node_id = 0x2A;
 
     LOG_INF("Oresat template starting on board: %s", CONFIG_BOARD_TARGET);
+
+    // Confirm a newly booted MCUboot image if self-tests pass
+    if (!boot_is_img_confirmed()) {
+        LOG_INF("New firmware detected. Pending confirmation.");
+        
+        if (run_self_tests()) {
+            LOG_INF("Self-tests passed. Confirming image.");
+            int rc = boot_write_img_confirmed();
+            if (rc < 0) {
+                LOG_ERR("Failed to confirm MCUboot image: %d", rc);
+            }
+        } else {
+            LOG_ERR("Self-tests failed. Rebooting to revert firmware...");
+            k_msleep(500); // Let logs flush
+            sys_reboot(SYS_REBOOT_COLD);
+        }
+    } else {
+        LOG_INF("Firmware already confirmed.");
+    }
+
     LOG_INF("Starting CANopenNode (node_id=%u, bitrate=%u kbps)",
             (unsigned)node_id, (unsigned)CAN_BITRATE);
 
@@ -68,6 +98,7 @@ int main(void)
 
         printk("Template app running. Waiting for CANopen requests...\r\n");
 
+        // Main CANopen processing loop
         while (true) {
             timeout = 1;
             timestamp = k_uptime_get();
