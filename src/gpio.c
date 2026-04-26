@@ -102,6 +102,12 @@ LOG_MODULE_REGISTER(oresat_gpio_demo, LOG_LEVEL_DBG);
  *
  * After this X macro is used, undefine it so another X macro
  * can be created to use the same raw data above.
+ *
+ * The resulting enums will be named, for example:
+ *   TP84 for port 0 bit 3
+ *   TP85 for port 0 bit 4
+ * You can then use these names in your custom source code.
+ *
  **/
 #define X(tpnum, port, bit) TP ## tpnum,
 typedef enum {
@@ -131,6 +137,16 @@ typedef struct gpio_tp {
  * of these structures, by invoking GPIO_DEFS again.
  *
  * As recommended, undefine X so it could be redefined later.
+ *
+ * An example initialization entry for the array is:
+ *
+ *   {GPIO_DT_SPEC_GET(BP_NODE, tp84_p0_3_gpios), 84, 0, 3},
+ *
+ * You can then access a specific gpio_tp structure in the
+ * gpio_tp_array by enum name, such as:
+ *
+ *   gpio_tp *my_new_led = &gpio_tp_array[TP84];
+ *
  */
 #define X(tpnum, port, bit) {GPIO_DT_SPEC_GET(BP_NODE, tp ## tpnum ## _p ## port ## _ ## bit ## _gpios), tpnum, port, bit},
 static const gpio_tp gpio_tp_array[NUM_GPIO_TPS] = {
@@ -140,19 +156,36 @@ static const gpio_tp gpio_tp_array[NUM_GPIO_TPS] = {
 
 static int gpios_init(void)
 {
-	int ret;
-
 	/**
 	 * The GPIO test points are configured by default as inputs with
 	 * pulldowns. As an example of changing the configuration at
 	 * runtime, rather than in the device tree at startup only, here
 	 * we configure TP84, which is routed to Port 0 bit 3, as an
 	 * output which is active.
+	 * By setting TP84 to be an output, as shown below, you could
+	 * hook up a new LED + resistor to TP84 and be able to turn it
+	 * on and off.
 	 */
-	ret = gpio_pin_configure_dt(&gpio_tp_array[TP84].dt, GPIO_OUTPUT_ACTIVE | GPIO_ACTIVE_HIGH);
+#if 0
+	const gpio_tp *my_new_led = &gpio_tp_array[TP84];
+	int ret = gpio_pin_configure_dt(&my_new_led->dt, GPIO_OUTPUT_ACTIVE | GPIO_ACTIVE_HIGH);
+
 	if (ret) {
-		return ret;
+	    return ret;
 	}
+#endif
+
+#if 0
+	// modify the handle_gpios() function below to also toggle the new LED
+
+	const gpio_tp *my_new_led = &gpio_tp_array[TP84]; // <-- add this line
+
+	for (;;) {
+		gpios_log();
+		k_msleep(1000);
+		gpio_pin_toggle_dt(&my_new_led->dt); // <-- add this line
+	}
+#endif
 	return 0;
 }
 

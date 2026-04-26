@@ -8,8 +8,8 @@
 
 &pinctrl {
 
-/* TP76 = SDA */
-/* TP77 = SCL */
+/* TP76 = SDA = PIO0_16 */
+/* TP77 = SCL = PIO0_17 */
 	pinmux_flexcomm0_lpi2c: pinmux_flexcomm0_lpi2c {
 		group0 {
 			pinmux = <FC0_P0_PIO0_16>,
@@ -22,8 +22,10 @@
 		};
 	};
 
-/* TP3 = RXD */
-/* TP13 = TXD */
+/* TP46 = SDO = PIO4_12 */
+/* TP45 = SCK = PIO4_13 */
+/* TP43 = SDI = PIO4_16 */
+/* TP42 = PCS = PIO4_17 */
 	pinmux_flexcomm2_lpspi: pinmux_flexcomm2_lpspi {
 		group0 {
 			pinmux = <FC2_P0_PIO4_12>,
@@ -36,6 +38,8 @@
 		};
 	};
 
+/* TP3  = RXD = PIO1_8 */
+/* TP13 = TXD = PIO1_9 */
 	pinmux_flexcomm4_lpuart: pinmux_flexcomm4_lpuart {
 		group0 {
 			pinmux = <FC4_P0_PIO1_8>,
@@ -46,6 +50,10 @@
 		};
 	};
 
+/* JP2 pin 12 = CAN2_H = CAN0_TXD = PIO1_10 */
+/* JP2 pin 11 = CAN2_L = CAN0_RXD = PIO1_11 */
+/* NOTE: CAN2_H and CAN2_L also connect to the Main Oresat Card Connector. These
+   signals connect to CAN0_TXD and CAN0_RXD through U8, the CAN Transceiver. */
 	pinmux_flexcan0: pinmux_flexcan0 {
 		group0 {
 			/* Main OreSat Card Connector CAN2_H and _L */
@@ -57,13 +65,13 @@
 		};
 	};
 
-/* TP53 */
-/* TP50 */
-/* TP51 */
-/* TP49 */
-/* TP48 */
-/* TP47 */
-/* TP61 */
+/* TP53 = SS0   = PIO3_0 */
+/* TP50 = SCLK  = PIO3_7 */
+/* TP51 = DQS   = PIO3_6 */
+/* TP49 = DATA0 = PIO3_8 */
+/* TP48 = DATA1 = PIO3_9 */
+/* TP47 = DATA2 = PIO3_10 */
+/* TP61 = DATA3 = PIO3_11 */
 	pinmux_flexspi: pinmux_flexspi {
 		group0 {
 			pinmux = <FLEXSPI0_A_SS0_b_PIO3_0>,
@@ -85,7 +93,7 @@
 		};
 	};
 
-/* TP28 */
+/* TP28 = DAC0 = PIO4_2 */
 	pinmux_dac0: pinmux_dac0 {
 		group0 {
 			pinmux = <DAC0_OUT_PIO4_2>;
@@ -94,8 +102,8 @@
 		};
 	};
 
-/* TP18 */
-/* TP19 */
+/* TP18 = PIO2_6 */
+/* TP19 = PIO2_7 */
 	pinmux_flexpwm1_pwm0: pinmux_flexpwm1_pwm0 {
 		group0 {
 			pinmux = <PWM1_A0_PIO2_6>,
@@ -105,8 +113,8 @@
 		};
 	};
 
-/* TP14 */
-/* TP17 */
+/* TP14 = PIO2_4 */
+/* TP17 = PIO2_5 */
 	pinmux_flexpwm1_pwm1: pinmux_flexpwm1_pwm1 {
 		group0 {
 			pinmux = <PWM1_A1_PIO2_4>,
@@ -116,8 +124,8 @@
 		};
 	};
 
-/* TP11 */
-/* TP12 */
+/* TP11 = PIO2_2 */
+/* TP12 = PIO2_3 */
 	pinmux_flexpwm1_pwm2: pinmux_flexpwm1_pwm2 {
 		group0 {
 			pinmux = <PWM1_A2_PIO2_2>,
@@ -127,7 +135,7 @@
 		};
 	};
 
-/* TP68 */
+/* TP68 = PIO 1_0 = CMP0_IN0P */
 	pinmux_lpcmp0: pinmux_lpcmp0 {
 		group0 {
 			pinmux = <CMP0_IN0_PIO1_0>;
@@ -137,7 +145,7 @@
 		};
 	};
 
-/* TP11 */
+/* TP11 = PIO2_2 */
 	pinmux_sctimer: pinmux_sctimer {
 		group0 {
 			pinmux = <SCT0_OUT0_PIO2_2>;
@@ -147,8 +155,8 @@
 		};
 	};
 
-/* TP30 = MAX4211 Iout measurement */
-/* TP44 */
+/* TP30 = PIO4_0  = ADC0_CH0 = MAX4211 Iout measurement */
+/* TP44 = PIO4_15 = ADC0_CH1 */
 	pinmux_lpadc0: pinmux_lpadc0 {
 		group0 {
 			pinmux = <ADC0_A0_PIO4_0>,
