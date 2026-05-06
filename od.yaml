@@ -1,0 +1,45 @@
+name: template_app
+nice_name: Template_App
+
+objects:
+  - index: 0x1F50
+    name: program_data
+    description: firmware image data stream
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: program_data_1
+        data_type: domain
+        description: firmware bytes
+        access_type: wo
+
+  - index: 0x1F51
+    name: program_control
+    description: controls firmware update process
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: program_control_1
+        data_type: uint8
+        description: command byte
+        access_type: rw
+
+  - index: 0x1F56
+    name: program_software_id
+    description: identification of loaded program
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: program_software_id_1
+        data_type: uint32
+        access_type: ro
+
+  - index: 0x1F57
+    name: flash_status
+    description: status/error of firmware update procedure
+    object_type: record
+    subindexes:
+      - subindex: 0x1
+        name: flash_status_1
+        data_type: uint32
+        access_type: ro

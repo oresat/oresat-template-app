@@ -11,18 +11,22 @@
  * west build -t menuconfig for an interacive configuration
  * editor.
  */
+#include <zephyr/device.h>
+#include <zephyr/dfu/mcuboot.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/printk.h>
+#include <zephyr/sys/reboot.h>
+
+#include <CANopen.h>
+#include <canopennode.h>
+
 
 LOG_MODULE_REGISTER(oresat_zephyr_template, LOG_LEVEL_DBG);
 
 int main(void)
 {
-    LOG_INF("Oresat app template starting up on board: %s", CONFIG_BOARD_TARGET);
+    LOG_INF("Oresat template starting on board: %s", CONFIG_BOARD_TARGET);
 
-    printk("Logging from printk\r\n");
     return 0;
 }
-
-

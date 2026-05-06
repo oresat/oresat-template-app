@@ -8,53 +8,102 @@ module = APP_TEMPLATE
 module-str = APP TEMPLATE
 
 config BOARD_OVERLAY_PRESENT
-    bool
-    default $(dt_nodelabel_exists,oresat_demo)
+	bool
+	default $(dt_nodelabel_exists,oresat_demo)
 
 if BOARD_OVERLAY_PRESENT
 
-    menu "Oresat demo options"
+	menu "Oresat demo options"
 
-    config BLINK_DEMO
-        bool "Blink an LED"
-        default y
-        help
-        Enable the thread which blinks an LED.
+	config BLINK_DEMO
+		bool "Blink an LED"
+		default y
+		help
+		  Enable the thread which blinks an LED.
 
-    config I2C_SENSOR_DEMO
-        bool "Enable monitoring an I2C sensor"
-        default y
-        help
-        Enable reading from a Bosch Sensortec BME280.
+	config I2C_SENSOR_DEMO
+		bool "Enable monitoring an I2C sensor"
+		default y
+		select I2C
+		select SENSOR
+		select SENSOR_ASYNC_API
+		help
+		  Enable reading from a Bosch Sensortec BME280.
 
-    config DAC_DEMO
-        bool "Enable generation of a sawtooth pattern."
-        default y
-        help
-        Enable a slowly repeating sawtooth from 0 to 3.3v.
+	config DAC_DEMO
+		bool "Enable generation of a sawtooth pattern."
+		default y
+		select DAC
+		help
+		  Enable a slowly repeating sawtooth from 0 to 3.3v.
 
-    config ADC_DEMO
-        bool "Enable monitoring one or more ADC channels."
-        default y
-        help
-        Outputs the data scaled to mV.
+	config CAN_DEMO
+		bool "Enable sending CAN packets."
+		default y
+		select CAN
+		select CANOPENNODE
+		select USE_STM32_HAL_FLASH if SOC_STM32F091XC
+		select USE_STM32_HAL_FLASH_EX if SOC_STM32F091XC
+		select USE_STM32_HAL_CAN if SOC_STM32F091XC
+		help
+		  Enable CAN interface and send data from CO_OD.
 
-    if ADC_DEMO
+	config GPIO_DEMO
+		bool "Enable monitoring GPIOs."
+		default y
+		help
+		  Enable logging of initial GPIO states, followed
+		  by periodic logging of changes.
 
-        config SEQUENCE_SAMPLES
-            int "Number of samples to be made on the sequence for each channel."
-            default 5
+	config ADC_DEMO
+		bool "Enable monitoring one or more ADC channels."
+		default y
+		select ADC
+		select DMA
+		select ADC_STM32 if SOC_STM32F091XC
+		select ADC_STM32_DMA if SOC_STM32F091XC
+		select DMA_STM32 if SOC_STM32F091XC
+		help
+		  Outputs the data scaled to mV.
 
-        config SEQUENCE_RESOLUTION
-            int "Set the resolution of the sequence readings."
-            default 12
+	if ADC_DEMO
 
-        config SEQUENCE_32BITS_REGISTERS
-            bool "ADC data sequences are on 32bits"
-            default n
+		config SEQUENCE_SAMPLES
+			int "Number of samples to be made on the sequence for each channel."
+			default 5
 
-    endif  # ADC_DEMO
+		config SEQUENCE_RESOLUTION
+			int "Set the resolution of the sequence readings."
+			default 12
 
-    endmenu
+		config SEQUENCE_32BITS_REGISTERS
+			bool "ADC data sequences are on 32bits"
+			default n
+
+	endif  # ADC_DEMO
+
+	if !SOC_STM32F091XC
+
+		config MCUBOOT_ALLOWED
+			bool
+			default y
+			select BOOTLOADER_MCUBOOT
+			select MCUBOOT_GENERATE_UNSIGNED_IMAGE
+			select FLASH
+			select FLASH_MAP
+			select STREAM_FLASH
+			select IMG_MANAGER
+			select MCUBOOT_GENERATE_CONFIRMED_IMAGE
+			help
+			  Define helper symbol CONFIG_MCUBOOT_ALLOWED for all supported
+			  architectures that have room for the required partitions in flash
+			  and have those partitions defined in the device tree. This
+			  eliminates the need for the user to either change prj.conf to
+			  enable MCUBOOT or provide an EXTRA_CONF_FILE option to west that
+			  names an overlay file.
+
+	endif
+
+	endmenu
 
 endif # BOARD_OVERLAY_PRESENT

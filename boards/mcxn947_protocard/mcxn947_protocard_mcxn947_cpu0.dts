@@ -1,0 +1,10 @@
+
+/dts-v1/;
+
+#include "mcxn947_protocard_mcxn947_cpu0.dtsi"
+#include "mcxn947_protocard-pinctrl.dtsi"
+
+/ {
+	model = "NXP MCXN947 Protocard";
+	compatible = "nxp,mcxn947", "nxp,mcx";
+};

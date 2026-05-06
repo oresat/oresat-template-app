@@ -1,0 +1,407 @@
+/*
+ * Copyright 2024 NXP
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* Common dts file to enable supported features for CPU 0.
+ * This file is included by both the default variant
+ * which is run from internal flash and the QSPI variant.
+ */
+/dts-v1/;
+
+#include <nxp/nxp_mcxn94x.dtsi>
+
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/adc/mcux-lpadc.h>
+#include <zephyr/dt-bindings/i2c/i2c.h>
+#include <zephyr/dt-bindings/spi/spi.h>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/gpio/nxp-kinetis-gpio.h>
+#include <zephyr/dt-bindings/pwm/pwm.h>
+
+/ {
+	cpus {
+		/delete-node/ cpu@1;
+	};
+
+	oresat_demo: oresat-demo-enabled {}; /* Enable demos for supported boards */
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash;
+		zephyr,flash-controller = &fmu;
+		zephyr,code-partition = &slot0_partition;
+		zephyr,uart-mcumgr = &flexcomm4_lpuart4;
+		zephyr,console = &flexcomm4_lpuart4;
+		zephyr,shell-uart = &flexcomm4_lpuart4;
+		zephyr,canbus = &flexcan0;
+		zephyr,code-cpu1-partition = &slot1_partition;
+	};
+
+	aliases {
+		led0 = &amber_led;
+		watchdog0 = &wwdt0;
+		rtc = &rtc;
+		adc0 = &lpadc0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		amber_led: led_0 {
+			gpios = <&gpio1 13 GPIO_ACTIVE_LOW>;
+			label = "Amber LED";
+			status = "okay";
+		};
+	};
+
+	zephyr,user {
+		dac = <&dac0>;
+		dac-channel-id = <0>;
+		dac-resolution = <12>;
+		status = "okay";
+	};
+
+	protogpios: proto-gpios {
+		compatible = "proto-card";
+		/* These are all the I/O lines not allocated to various peripherals below */
+		tp84-p0-3-gpios = <&gpio0 3 GPIO_PULL_DOWN>;
+		tp85-p0-4-gpios = <&gpio0 4 GPIO_PULL_DOWN>;
+		tp86-p0-5-gpios = <&gpio0 5 GPIO_PULL_DOWN>;
+		tp78-p0-18-gpios = <&gpio0 18 GPIO_PULL_DOWN>;
+		tp79-p0-19-gpios = <&gpio0 19 GPIO_PULL_DOWN>;
+		tp80-p0-20-gpios = <&gpio0 20 GPIO_PULL_DOWN>;
+		tp81-p0-21-gpios = <&gpio0 21 GPIO_PULL_DOWN>;
+		tp82-p0-22-gpios = <&gpio0 22 GPIO_PULL_DOWN>;
+		tp83-p0-23-gpios = <&gpio0 23 GPIO_PULL_DOWN>;
+		tp68-p1-0-gpios = <&gpio1 0 GPIO_PULL_DOWN>;
+		tp69-p1-1-gpios = <&gpio1 1 GPIO_PULL_DOWN>;
+		tp70-p1-2-gpios = <&gpio1 2 GPIO_PULL_DOWN>;
+		tp71-p1-3-gpios = <&gpio1 3 GPIO_PULL_DOWN>;
+		tp72-p1-4-gpios = <&gpio1 4 GPIO_PULL_DOWN>;
+		tp73-p1-5-gpios = <&gpio1 5 GPIO_PULL_DOWN>;
+		tp74-p1-6-gpios = <&gpio1 6 GPIO_PULL_DOWN>;
+		tp75-p1-7-gpios = <&gpio1 7 GPIO_PULL_DOWN>;
+		tp5-p1-12-gpios = <&gpio1 12 GPIO_PULL_DOWN>;
+		tp7-p1-14-gpios = <&gpio1 14 GPIO_PULL_DOWN>;
+		tp8-p1-15-gpios = <&gpio1 15 GPIO_PULL_DOWN>;
+		tp9-p2-0-gpios = <&gpio2 0 GPIO_PULL_DOWN>;
+		tp10-p2-1-gpios = <&gpio2 1 GPIO_PULL_DOWN>;
+		tp52-p3-1-gpios = <&gpio3 1 GPIO_PULL_DOWN>;
+		tp60-p3-12-gpios = <&gpio3 12 GPIO_PULL_DOWN>;
+		tp59-p3-13-gpios = <&gpio3 13 GPIO_PULL_DOWN>;
+		tp58-p3-14-gpios = <&gpio3 14 GPIO_PULL_DOWN>;
+		tp57-p3-15-gpios = <&gpio3 15 GPIO_PULL_DOWN>;
+		tp56-p3-16-gpios = <&gpio3 16 GPIO_PULL_DOWN>;
+		tp55-p3-17-gpios = <&gpio3 17 GPIO_PULL_DOWN>;
+		tp62-p3-20-gpios = <&gpio3 20 GPIO_PULL_DOWN>;
+		tp63-p3-21-gpios = <&gpio3 21 GPIO_PULL_DOWN>;
+		tp29-p4-1-gpios = <&gpio4 1 GPIO_PULL_DOWN>;
+		tp27-p4-3-gpios = <&gpio4 3 GPIO_PULL_DOWN>;
+		tp26-p4-4-gpios = <&gpio4 4 GPIO_PULL_DOWN>;
+		tp25-p4-5-gpios = <&gpio4 5 GPIO_PULL_DOWN>;
+		tp22-p4-6-gpios = <&gpio4 6 GPIO_PULL_DOWN>;
+		tp20-p4-7-gpios = <&gpio4 7 GPIO_PULL_DOWN>;
+		tp41-p4-19-gpios = <&gpio4 19 GPIO_PULL_DOWN>;
+		tp64-p5-0-gpios = <&gpio5 0 GPIO_PULL_DOWN>;
+		tp65-p5-1-gpios = <&gpio5 1 GPIO_PULL_DOWN>;
+		tp66-p5-2-gpios = <&gpio5 2 GPIO_PULL_DOWN>;
+		tp67-p5-3-gpios = <&gpio5 3 GPIO_PULL_DOWN>;
+	};
+};
+
+&systick {
+	status = "okay";
+};
+
+&lpadc0 {
+	pinctrl-0 = <&pinmux_lpadc0>;
+	pinctrl-names = "default";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	lpadc0_0: channel@0 {
+		reg = <0>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_EXTERNAL0";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS,2)>;
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <5>;
+		zephyr,input-positive = <MCUX_LPADC_CH0A>;
+		/delete-property/ zephyr,differential;
+	};
+	lpadc0_1: channel@1 {
+		reg = <1>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_EXTERNAL0";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS,2)>;
+		zephyr,resolution = <12>;
+		 zephyr,oversampling = <5>;
+		zephyr,input-positive = <MCUX_LPADC_CH1A>;
+		 /delete-property/ zephyr,differential;
+	};
+/***************************
+ Internal temperature sensor
+ channel is disabled here
+ due to bus fault -- requires
+ debugging.
+ ***************************/
+/*	lpadc0_26: channel@1a {
+		reg = <26>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_EXTERNAL0";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS,2)>;
+		zephyr,resolution = <16>;
+		zephyr,oversampling = <7>;
+		zephyr,input-positive = <MCUX_LPADC_CH26A>;
+		zephyr,input-negative = <MCUX_LPADC_CH26B>;
+		zephyr,differential;
+	}; */
+};
+
+/*
+ * Default for this board is to allocate SRAM0-5 to cpu0 but the
+ * application can have an application specific device tree to
+ * allocate the SRAM0-7 differently.
+ *
+ * For example, SRAM0-6 could be allocated to cpu0 with only SRAM7
+ * for cpu1. This would require the value of sram0 to have a DT_SIZE_K
+ * of 384. You would have to make updates to cpu1 sram settings as well.
+ */
+&sram0 {
+	compatible = "mmio-sram";
+	reg = <0x20000000 DT_SIZE_K(320)>;
+};
+
+&sram {
+	sramg: memory@20050000 {
+		compatible = "mmio-sram";
+		reg = <0x20050000 DT_SIZE_K(64)>;
+	};
+	sramh: memory@20060000 {
+		compatible = "mmio-sram";
+		reg = <0x20060000 DT_SIZE_K(32)>;
+	};
+};
+
+&flash {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		/*
+		 * Partition sizes must be aligned
+		 * to the flash memory sector size of 8KB.
+		 */
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 DT_SIZE_K(80)>;
+		};
+		slot0_partition: partition@14000 {
+			label = "image-0";
+			reg = <0x00014000 DT_SIZE_K(968)>;
+		};
+		slot1_partition: partition@10A000 {
+			label = "image-1";
+			reg = <0x0010A000 DT_SIZE_K(968)>;
+		};
+		storage_partition: partition@1fc000 {
+			label = "storage";
+			reg = <0x001fc000 DT_SIZE_K(16)>;
+		};
+	};
+};
+
+&mbox {
+	status = "okay";
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&gpio1 {
+	status = "okay";
+};
+
+&gpio2 {
+	status = "okay";
+};
+
+&gpio3 {
+	status = "okay";
+};
+
+&gpio4 {
+	status = "okay";
+};
+
+&gpio5 {
+	status = "okay";
+};
+
+&edma0 {
+	status = "okay";
+};
+
+&flexcomm0 {
+	status = "okay";
+};
+
+&flexcomm0_lpi2c0 {
+	pinctrl-0 = <&pinmux_flexcomm0_lpi2c>;
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_FAST>;
+	status = "okay";
+
+	/* Add I2C target devices here, for example:
+	tmp101_cell1: tmp101@48 {
+		compatible = "ti,tmp101";
+		reg = <0x48>;
+		status = "okay";
+	};
+	*/
+	bme280: bme280@77 {
+		compatible = "bosch,bme280";
+		reg = <0x77>;
+        status = "okay";
+	};
+};
+
+&flexcomm2 {
+	status = "okay";
+};
+
+/* SPI available on port4 (SDO, SCK, SDI, and 4 CS lines) */
+&flexcomm2_lpspi2 {
+	pinctrl-0 = <&pinmux_flexcomm2_lpspi>;
+	pinctrl-names = "default";
+	status = "disabled"; /* change to okay to enable */
+};
+
+&flexcomm4 {
+	status = "okay";
+};
+
+&flexcomm4_lpuart4 {
+	current-speed = <115200>;
+	pinctrl-0 = <&pinmux_flexcomm4_lpuart>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&flexcan0 {
+	pinctrl-0 = <&pinmux_flexcan0>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&dac0 {
+	pinctrl-0 = <&pinmux_dac0>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&wwdt0 {
+	status = "okay";
+};
+
+/* flexspi can be used for external SPI flash or RAM */
+&flexspi {
+	pinctrl-0 = <&pinmux_flexspi>;
+	pinctrl-names = "default";
+	ahb-prefetch;
+	ahb-bufferable;
+	ahb-cacheable;
+	ahb-read-addr-opt;
+	combination-mode;
+	rx-clock-source = <1>;
+	status = "disabled"; /* change to okay to enable */
+};
+
+&flexpwm1_pwm0 {
+	pinctrl-0 = <&pinmux_flexpwm1_pwm0>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&flexpwm1_pwm1 {
+	pinctrl-0 = <&pinmux_flexpwm1_pwm1>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&flexpwm1_pwm2 {
+	pinctrl-0 = <&pinmux_flexpwm1_pwm2>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&ctimer0 {
+	status = "okay";
+};
+
+&vref {
+	status = "okay";
+};
+
+&lpcmp0 {
+	pinctrl-0 = <&pinmux_lpcmp0>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&lptmr0 {
+	status = "okay";
+};
+
+&flexio0 {
+	status = "okay";
+};
+
+&mrt0_channel0 {
+	status = "okay";
+};
+
+&rtc {
+	status = "okay";
+};
+
+&sc_timer {
+	pinctrl-0 = <&pinmux_sctimer>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&enet {
+	status = "disabled";
+};
+
+//temp0: temp0 {
+//	compatible = "nxp,kinetis-temperature";
+//	io-channels = <&adc0 26>, <&adc0 27>;
+//	io-channel-names = "SENSOR", "BANDGAP";
+//	bandgap-voltage = <1000000>;
+//   /* Not sure this works with the MCXN947. The datasheet does not
+//      provide the Vtemp25 or slope constants, unlike for the KE1XF
+//      or MCXC. Numbers provided are similar but named different
+//	   for Vtemp25, which the MCXN calls Slope Factor Constant,
+//	   and instead of "sensor slope cold/hot", we get Offset Constant
+//	   and Bandgap Constant.
+//	   Those raw values are 771, 302, 10.06.
+//	   The KE1XF and MCXC datasheets show Vtemp25 740.5, slopes both
+//	   1.564; and 716, 1.62, so conversions to the below device
+//	   tree values are Vtemp25 datasheet * 1000 and sensor slope
+//	   datasheet * 1000 as well.  */
+//	vtemp25 = <740500>;
+//	sensor-slope-cold = <1564>;
+//	sensor-slope-hot = <1564>;
+//	status = "disabled";
+//};
+
