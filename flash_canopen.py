@@ -10,7 +10,7 @@ import canopen
 DEFAULT_SERIAL_PORT = "/dev/cu.usbmodem101"
 DEFAULT_CHANNEL = DEFAULT_SERIAL_PORT
 DEFAULT_BITRATE = 1_000_000
-DEFAULT_NODE_ID = 0x2A
+DEFAULT_NODE_ID = 0x7C
 DEFAULT_BIN_PATH = Path("build-sysbuild/template/zephyr/zephyr.signed.bin")
 
 DEFAULT_BLOCK_TRANSFER = False

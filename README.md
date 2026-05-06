@@ -225,6 +225,10 @@ If a runtime error occurs, `<err>` logs are generated.
 
 ### Example output with four demos enabled on Oresat Breakout
 
+<details>
+<summary>Click to expand</summary>
+
+
 ```
 [00:00:00.004,000] <dbg> BME280: bme280_chip_init: ID OK
 [00:00:00.014,000] <dbg> BME280: bme280_chip_init: "bme280@77" OK
@@ -270,8 +274,13 @@ temp: 25.509979; press: 101.703125; humidity: 45.500976
  1159, 1160, 1159, 1159, 1161, 1159, 1160, 1159,
    0,   0,   0,   0,   0,   0,   0,   0,
 ```
+</details>
 
 ### Example output with all demos enabled on Oresat MCXN Proto Card
+
+<details>
+<summary>Click to expand</summary>
+
 ```
 *** Booting MCUboot v2.2.0-54-g4eba8087fa60 ***
 *** Using Zephyr OS build v4.2.0 ***
@@ -380,6 +389,7 @@ Channel 0: 382, 321, 336, 609, 273, 281, 506, 228,
 Channel 1: 816, 1227, 509, 584, 1021, 409, 483, 609,
 Channel 0: 336, 429, 406, 301, 609, 246, 281, 506,
 Channel 1: 815, 639, 802, 609, 538, 815, 406, 437,
+</details>
 ```
 
 ---

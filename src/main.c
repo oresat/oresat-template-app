@@ -21,7 +21,6 @@
 #include <CANopen.h>
 #include <canopennode.h>
 
-//#include <oresat.h>
 
 LOG_MODULE_REGISTER(oresat_zephyr_template, LOG_LEVEL_DBG);
 
