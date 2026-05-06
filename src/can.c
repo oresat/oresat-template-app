@@ -47,7 +47,9 @@ static void handle_can(void *p1, void *p2, void *p3)
 	LOG_INF("Starting CAN thread");
 
 	// Confirm a newly booted MCUboot image if self-tests pass
-	if (!boot_is_img_confirmed()) {
+	if (!IS_ENABLED(CONFIG_BOOTLOADER_MCUBOOT)) {
+		/* do nothing */
+	} else if (!boot_is_img_confirmed()) {
 		LOG_INF("New firmware detected. Pending confirmation.");
 
 		if (run_self_tests()) {
@@ -88,7 +90,9 @@ static void handle_can(void *p1, void *p2, void *p3)
 			__ASSERT(false, "Fatal error");
 		}
 
-		canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
+		if (IS_ENABLED(CONFIG_BOOTLOADER_MCUBOOT)) {
+			canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);
+		}
 		CO_CANsetNormalMode(CO->CANmodule[0]);
 
 		LOG_INF("Template app running. Waiting for CANopen requests...");

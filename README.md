@@ -204,10 +204,10 @@ Ensure you are in the `template` directory (`cd src/oresat/firmware/apps/templat
 | Board         | Build Example                                          |
 | ------------- | ----------------------------------------------------- | 
 | FRDM-MCXN947  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0` |
-| FRDM-MCXN947 with MCUboot  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 --sysbuild` |
+| FRDM-MCXN947 with MCUboot  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 --sysbuild -- -DEXTRA_CONF_FILE='mcuboot_overlay.conf'` |
 | NUCLEO-R091RC | `west build -p always -b nucleo_f091rc`             |
 | mcxn947_protocard | `west build -p always -b mcxn947_protocard/mcxn947/cpu0` |  
-| mcxn947_protocard with MCUboot | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 --sysbuild -- -DBOARD_ROOT=$PWD` |  
+| mcxn947_protocard with MCUboot | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 --sysbuild -- -DBOARD_ROOT=$PWD -DEXTRA_CONF_FILE='mcuboot_overlay.conf'` |  
 
 Flash the build using `west flash`. The Oresat Card Debug Board works with `pyocd` as the runner and with proper configuration
 of The PyOCD pack `NXP.MCXN947_DFP.19.0.0.pack`. Note that more recent versions do not work.
