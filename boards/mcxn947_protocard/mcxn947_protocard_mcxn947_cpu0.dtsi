@@ -121,14 +121,13 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	status = "okay";
-
 	lpadc0_0: channel@0 {
 		reg = <0>;
 		zephyr,gain = "ADC_GAIN_1";
 		zephyr,reference = "ADC_REF_EXTERNAL0";
 		zephyr,vref-mv = <3300>;
 		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS,2)>;
-		zephyr,resolution = <12>;
+		zephyr,resolution = <16>;
 		zephyr,oversampling = <5>;
 		zephyr,input-positive = <MCUX_LPADC_CH0A>;
 		/delete-property/ zephyr,differential;
@@ -139,29 +138,23 @@
 		zephyr,reference = "ADC_REF_EXTERNAL0";
 		zephyr,vref-mv = <3300>;
 		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS,2)>;
-		zephyr,resolution = <12>;
-		 zephyr,oversampling = <5>;
+		zephyr,resolution = <16>;
+		zephyr,oversampling = <5>;
 		zephyr,input-positive = <MCUX_LPADC_CH1A>;
-		 /delete-property/ zephyr,differential;
+		/delete-property/ zephyr,differential;
 	};
-/***************************
- Internal temperature sensor
- channel is disabled here
- due to bus fault -- requires
- debugging.
- ***************************/
-/*	lpadc0_26: channel@1a {
-		reg = <26>;
+	lpadc0_2: channel@2 {
+		reg = <2>;
 		zephyr,gain = "ADC_GAIN_1";
 		zephyr,reference = "ADC_REF_EXTERNAL0";
 		zephyr,vref-mv = <3300>;
-		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_MICROSECONDS,2)>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS,131)>;
 		zephyr,resolution = <16>;
 		zephyr,oversampling = <7>;
 		zephyr,input-positive = <MCUX_LPADC_CH26A>;
-		zephyr,input-negative = <MCUX_LPADC_CH26B>;
-		zephyr,differential;
-	}; */
+		zephyr,input-positive = <MCUX_LPADC_CH26B>;
+		/delete-property/ zephyr,differential;
+	};
 };
 
 /*
@@ -270,7 +263,7 @@
 	bme280: bme280@77 {
 		compatible = "bosch,bme280";
 		reg = <0x77>;
-        status = "okay";
+		 status = "okay";
 	};
 };
 
@@ -389,16 +382,16 @@
 //	io-channel-names = "SENSOR", "BANDGAP";
 //	bandgap-voltage = <1000000>;
 //   /* Not sure this works with the MCXN947. The datasheet does not
-//      provide the Vtemp25 or slope constants, unlike for the KE1XF
-//      or MCXC. Numbers provided are similar but named different
-//	   for Vtemp25, which the MCXN calls Slope Factor Constant,
-//	   and instead of "sensor slope cold/hot", we get Offset Constant
-//	   and Bandgap Constant.
-//	   Those raw values are 771, 302, 10.06.
-//	   The KE1XF and MCXC datasheets show Vtemp25 740.5, slopes both
-//	   1.564; and 716, 1.62, so conversions to the below device
-//	   tree values are Vtemp25 datasheet * 1000 and sensor slope
-//	   datasheet * 1000 as well.  */
+// 	 provide the Vtemp25 or slope constants, unlike for the KE1XF
+// 	 or MCXC. Numbers provided are similar but named different
+//    for Vtemp25, which the MCXN calls Slope Factor Constant,
+//    and instead of "sensor slope cold/hot", we get Offset Constant
+//    and Bandgap Constant.
+//    Those raw values are 771, 302, 10.06.
+//    The KE1XF and MCXC datasheets show Vtemp25 740.5, slopes both
+//    1.564; and 716, 1.62, so conversions to the below device
+//    tree values are Vtemp25 datasheet * 1000 and sensor slope
+//    datasheet * 1000 as well.  */
 //	vtemp25 = <740500>;
 //	sensor-slope-cold = <1564>;
 //	sensor-slope-hot = <1564>;

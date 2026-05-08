@@ -20,7 +20,7 @@
 LOG_MODULE_REGISTER(oresat_adc_demo, LOG_LEVEL_DBG);
 
 /* size of stack area used by each thread */
-#define STACKSIZE 1024
+#define STACKSIZE 2048
 
 /* scheduling priority used by each thread */
 #define PRIORITY 7
@@ -30,6 +30,21 @@ LOG_MODULE_REGISTER(oresat_adc_demo, LOG_LEVEL_DBG);
 
 /* ADC node from the devicetree. */
 #define ADC_NODE DT_ALIAS(adc0)
+
+/* Rsense for MAX4211 */
+#define RSENSE_OHM 0.100
+
+/* Amplifier Gain for MAX4211 */
+#define AMPLIFIER_GAIN 40.96
+
+/* MCXN947 core temperature slope factor */
+#define TEMP_A 771
+
+/* MCXN947 core temperature offset constant */
+#define TEMP_B 302
+
+/* MCXN947 bandgap constant */
+#define TEMP_BG 10.06
 
 /* Auxiliary macro to obtain channel vref, if available. */
 #define CHANNEL_VREF(node_id) DT_PROP_OR(node_id, zephyr_vref_mv, 0)
@@ -103,6 +118,7 @@ static int handle_adc(void)
 		#endif
 	}
 
+	LOG_INF("Entering ADC loop");
 	while (1) {
 		k_msleep(ADC_SLEEP_TIME_MS);
 
@@ -111,6 +127,9 @@ static int handle_adc(void)
 			LOG_ERR("Could not read (%d)", err);
 			continue;
 		}
+
+		int32_t temp_v1 = 0;
+		int32_t temp_v2 = 0;
 
 		for (size_t channel_index = 0U; channel_index < CHANNEL_COUNT; channel_index++) {
 			int32_t raw;
@@ -128,6 +147,15 @@ static int handle_adc(void)
 							    channel_cfgs[channel_index].gain,
 							    CONFIG_SEQUENCE_RESOLUTION, &val_mv);
 
+				if (channel_index == 2) {
+					if (!err && vrefs_mv[channel_index] && (sample_index == 0)) {
+						temp_v1 = val_mv;
+					}
+				} else if (channel_index == 3) {
+					if (!err && vrefs_mv[channel_index] && (sample_index == 1)) {
+						temp_v2 = val_mv;
+					}
+				}
 				/* conversion to mV may not be supported, skip if not */
 				if ((err < 0) || vrefs_mv[channel_index] == 0) {
 					printk("% 4" PRId32 ",", raw);
@@ -137,6 +165,10 @@ static int handle_adc(void)
 			}
 			printk("\n");
 		}
+
+		double temperature = TEMP_A * (1.0 / (temp_v2 / (TEMP_BG * (temp_v2 - temp_v1)) + 1.0)) - TEMP_B;
+
+		printk("MCXN947 Core Temp (C) = %.2f; v1 = %d, v2 = %d\n", temperature, temp_v1, temp_v2);
 	}
 
 	return 0;

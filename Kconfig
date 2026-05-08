@@ -85,7 +85,7 @@ if BOARD_OVERLAY_PRESENT
 	if !SOC_STM32F091XC
 
 		config MCUBOOT_ALLOWED
-			bool
+			bool "MCUboot allowed."
 			default y
 			select BOOTLOADER_MCUBOOT
 			select MCUBOOT_GENERATE_UNSIGNED_IMAGE
