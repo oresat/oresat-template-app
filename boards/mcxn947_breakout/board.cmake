@@ -32,6 +32,10 @@ endif()
 # Pyocd support added with the NXP.MCXN947_DFP.17.0.0.pack CMSIS Pack
 board_runner_args(pyocd "--target=mcxn947")
 
+# Probe-RS support
+board_runner_args(probe-rs "--chip" "MCXN947")
+
+include(${ZEPHYR_BASE}/boards/common/probe-rs.board.cmake)
 include(${ZEPHYR_BASE}/boards/common/linkserver.board.cmake)
 include(${ZEPHYR_BASE}/boards/common/jlink.board.cmake)
 include(${ZEPHYR_BASE}/boards/common/pyocd.board.cmake)
