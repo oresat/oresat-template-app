@@ -1,6 +1,6 @@
 board:
   name: mcxn947_protocard
-  full_name: balls
+  full_name: Oresat MCXN947 Proto Card
   vendor: nxp
   socs:
     - name: mcxn947
