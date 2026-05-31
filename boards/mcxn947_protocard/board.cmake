@@ -33,7 +33,7 @@ endif()
 board_runner_args(pyocd "--target=mcxn947")
 
 # Probe-RS support
-board_runner_args(probe-rs "-O=--chip-description-path=${BOARD_DIR}/support/MCXN947.yaml" "--chip=MCXN947")
+board_runner_args(probe-rs "-O=--chip-description-path=${BOARD_DIR}/support/MCXN947.yaml" "--chip=MCXN947" "--speed" "'5000'")
 
 include(${ZEPHYR_BASE}/boards/common/probe-rs.board.cmake)
 include(${ZEPHYR_BASE}/boards/common/linkserver.board.cmake)
