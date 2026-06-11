@@ -5,6 +5,9 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/dfu/mcuboot.h>
+#include <zephyr/storage/flash_map.h>
+#include <stdio.h>
+#include <string.h>
 #include <canopennode.h>
 #include <CO_OD.h>
 #include <board_sensors.h>
@@ -20,6 +23,32 @@ LOG_MODULE_REGISTER(can_thread, LOG_LEVEL_DBG);
 #define CAN_THREAD_STACK_SIZE 2048
 #define CAN_THREAD_PRIORITY 0
 extern const k_tid_t can_id;
+
+static void inject_firmware_version(void) {
+	struct mcuboot_img_header header;
+	char version_str[32];
+	
+	int err = boot_read_bank_header(FIXED_PARTITION_ID(slot0_partition), 
+									&header, sizeof(header));
+	if (err == 0) {
+		snprintf(version_str, sizeof(version_str), "v%u.%u.%u+%u", 
+				 header.h.v1.sem_ver.major,
+				 header.h.v1.sem_ver.minor,
+				 header.h.v1.sem_ver.revision,
+				 header.h.v1.sem_ver.build_num);
+		LOG_INF("MCUboot Image Version: %s", version_str);
+	} else {
+		snprintf(version_str, sizeof(version_str), "Unknown");
+		LOG_ERR("Failed to read MCUboot header: %d", err);
+	}
+	
+	CO_LOCK_OD();
+	strncpy((char *)CO_OD_RAM.manufacturerSoftwareVersion, 
+			version_str, 
+			sizeof(CO_OD_RAM.manufacturerSoftwareVersion) - 1);
+	CO_OD_RAM.manufacturerSoftwareVersion[sizeof(CO_OD_RAM.manufacturerSoftwareVersion) - 1] = '\0';
+	CO_UNLOCK_OD();
+}
 
 static bool run_self_tests(void)
 {
@@ -89,6 +118,8 @@ static void handle_can(void *p1, void *p2, void *p3)
 			k_msleep(1000);
 			__ASSERT(false, "Fatal error");
 		}
+
+		inject_firmware_version();
 
 		if (IS_ENABLED(CONFIG_BOOTLOADER_MCUBOOT)) {
 			canopen_program_download_attach(CO->NMT, CO->SDO[0], CO->em);

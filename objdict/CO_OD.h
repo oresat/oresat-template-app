@@ -92,7 +92,7 @@
 /*******************************************************************************
    OBJECT DICTIONARY
 *******************************************************************************/
-   #define CO_OD_NoOfElements             39
+   #define CO_OD_NoOfElements             40
 
 
 /*******************************************************************************
@@ -590,6 +590,7 @@ struct sCO_OD_RAM{
 
 /*1001      */ UNSIGNED8      errorRegister;
 /*1003      */ UNSIGNED32      preDefinedErrorField[16];
+/*100A      */ VISIBLE_STRING manufacturerSoftwareVersion[32];
 /*1200      */ OD_SDOServerParameter_t SDOServerParameter[1];
 
 // firmware update OD indexes:
@@ -661,6 +662,11 @@ extern struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM;
         #define OD_preDefinedErrorField                             CO_OD_RAM.preDefinedErrorField
         #define ODL_preDefinedErrorField_arrayLength                16
         #define ODA_preDefinedErrorField_standardErrorField         0
+
+/*100A, Data Type: VISIBLE_STRING */
+        #define OD_manufacturerSoftwareVersion_idx                  0x100A
+        #define OD_manufacturerSoftwareVersion                      CO_OD_RAM.manufacturerSoftwareVersion
+        #define ODL_manufacturerSoftwareVersion_stringLength        32
 
 /*1014, Data Type: UNSIGNED32 */
         #define OD_COB_ID_EMCY_idx                                  0x1014

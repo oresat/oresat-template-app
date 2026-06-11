@@ -33,6 +33,7 @@ struct sCO_OD_RAM CO_OD_RAM = {
 
 /*1001*/ 0x0L,
 /*1003*/ {0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L, 0x0000L},
+/*100A*/ {0},
 /*1200*/ {{0x2L, 0x0600L, 0x0580L}},
 
 // firmware update OD indexes:
@@ -414,6 +415,7 @@ struct sCO_OD_PERSIST_COMM CO_OD_PERSIST_COMM = {
 const CO_OD_entry_t CO_OD[CO_OD_NoOfElements] = {
 {0x1001, 0x00, 0x26,  1, (void*)&CO_OD_RAM.errorRegister},
 {0x1003, 0x10, 0x8E,  4, (void*)&CO_OD_RAM.preDefinedErrorField[0]},
+{0x100A, 0x00, 0x0E, 32, (void*)&CO_OD_RAM.manufacturerSoftwareVersion},
 {0x1014, 0x00, 0x8F,  4, (void*)&CO_OD_PERSIST_COMM.COB_ID_EMCY},
 {0x1015, 0x00, 0x8F,  2, (void*)&CO_OD_PERSIST_COMM.inhibitTimeEMCY},
 {0x1016, 0x08, 0x8F,  4, (void*)&CO_OD_PERSIST_COMM.consumerHeartbeatTime[0]},
