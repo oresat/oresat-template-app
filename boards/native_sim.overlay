@@ -1,0 +1,4 @@
+/ {
+    oresat_demo: oresat-demo-enabled {}; // Enable demos for supported boards
+};
+
