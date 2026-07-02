@@ -203,12 +203,12 @@ The source code in `can.c` and `CO_OD.c` show how to:
 Ensure you are in the `template` directory (`cd src/oresat/firmware/apps/template`) prior to building.
 
 | Board         | Build Example                                          |
-| ------------- | ----------------------------------------------------- | 
-| FRDM-MCXN947  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0` |
+| ------------- | ----------------------------------------------------- |
+| FRDM-MCXN947  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 -- -DCONFIG_MCUBOOT_ALLOWED=n` |
 | FRDM-MCXN947 with MCUboot  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 --sysbuild` |
 | NUCLEO-R091RC | `west build -p always -b nucleo_f091rc`             |
-| mcxn947_protocard | `west build -p always -b mcxn947_protocard/mcxn947/cpu0` |  
-| mcxn947_protocard with MCUboot | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 --sysbuild -- -DBOARD_ROOT=$PWD` |  
+| mcxn947_protocard | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 -- -DCONFIG_MCUBOOT_ALLOWED=n` |
+| mcxn947_protocard with MCUboot | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 --sysbuild -- -DBOARD_ROOT=$PWD` |
 
 Flash the build using `west flash`. The Oresat Card Debug Board works with `pyocd` as the runner and with proper configuration
 of The PyOCD pack `NXP.MCXN947_DFP.19.0.0.pack`. Note that more recent versions do not work.
@@ -368,7 +368,7 @@ TPDO valid: 0x40000282, ID: 0x000002fe, nodeId: 0x007c, default COB_ID: 0x000000
 [00:00:00.484,000] <inf> oresat_blink_demo: Starting blink demo
 [00:00:00.490,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
 [00:00:00.498,000] <inf> oresat_i2c_sensor_demo: Starting I2C sensor demo
-[00:00:00.505,000] <err> oresat_i2c_sensor_demo: 
+[00:00:00.505,000] <err> oresat_i2c_sensor_demo:
 Error: Device "bme280@77" is not ready; check the driver initialization logs for errors.
 [00:00:00.518,000] <err> oresat_i2c_sensor_demo: Could not find the BME280
 Channel 0: 435, 348, 382, 609, 293, 336, 609, 246,
