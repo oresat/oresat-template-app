@@ -1,5 +1,6 @@
 board:
   name: mcxn947_protocard
+  full_name: balls
   vendor: nxp
   socs:
     - name: mcxn947
