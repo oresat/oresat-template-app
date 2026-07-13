@@ -1,3 +1,4 @@
+#include "zephyr/pm/state.h"
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/pm/policy.h>
@@ -33,13 +34,20 @@ const struct pm_state_info *pm_policy_next_state(uint8_t cpu, int32_t ticks)
         printk("Checking state %d (enum value = %d)\n",
                i,
                cpu_states[i].state);
+        
+        //if (cpu_states[i].state == PM_STATE_SUSPEND_TO_IDLE) {
 
-        if (cpu_states[i].state == PM_STATE_RUNTIME_IDLE) {
+        //    printk("Slecting PM_STATE_SUSPEND_TO_IDLE");
 
-            printk("Selecting PM_STATE_RUNTIME_IDLE\n");
+        //    return &cpu_states[i];
+        //}
 
-            return &cpu_states[i];     //tells zephyr to enter this state
-        }
+        //if (cpu_states[i].state == PM_STATE_RUNTIME_IDLE) {
+
+        //    printk("Selecting PM_STATE_RUNTIME_IDLE\n");
+
+        //    return &cpu_states[i];     //tells zephyr to enter this state
+        //}
     }
 
     printk("ERROR: PM_STATE_RUNTIME_IDLE not found!\n");
