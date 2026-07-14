@@ -34,13 +34,13 @@ const struct pm_state_info *pm_policy_next_state(uint8_t cpu, int32_t ticks)
         printk("Checking state %d (enum value = %d)\n",
                i,
                cpu_states[i].state);
-        
-        //if (cpu_states[i].state == PM_STATE_SUSPEND_TO_IDLE) {
 
-        //    printk("Slecting PM_STATE_SUSPEND_TO_IDLE");
+        if (cpu_states[i].state == PM_STATE_SUSPEND_TO_IDLE) {
 
-        //    return &cpu_states[i];
-        //}
+            printk("Slecting PM_STATE_SUSPEND_TO_IDLE");
+
+            return &cpu_states[i];
+        }
 
         //if (cpu_states[i].state == PM_STATE_RUNTIME_IDLE) {
 
@@ -62,14 +62,15 @@ int main(void)
     printk(" MCXN947 Sleep Mode Test\n");
     printk("=====================================\n");
 
+    printk("\nCPU ACTIVE\n");                   //CPU running normally
+    printk("Preparing to enter Sleep...\n");
+
+    k_sleep(K_MSEC(SLEEP_TIME_MS));   // Allows idle mode
+
+    printk("CPU AWAKE\n");    //Runs after sleep completes
+
     while (1) {
-
-        printk("\nCPU ACTIVE\n");                   //CPU running normally 
-        printk("Preparing to enter Sleep...\n");
-
-        k_sleep(K_MSEC(SLEEP_TIME_MS));   // Allows idle mode 
-
-        printk("CPU AWAKE\n");    //Runs after sleep completes
+        printk("done sleeping");
     }
 
     return 0;
