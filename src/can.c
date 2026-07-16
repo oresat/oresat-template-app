@@ -103,6 +103,10 @@ static void handle_can(void *p1, void *p2, void *p3)
 			timeout = 1U;
 			timestamp = k_uptime_get();
 
+			if (CO_isError(CO->em, CO_EM_CAN_TX_OVERFLOW)) {
+				CO_errorReset(CO->em, CO_EM_CAN_TX_OVERFLOW, 111);
+			}
+
 			if (wr_timeout_count++ >= 1000U) {
 				wr_timeout_count = 0U;
 
@@ -121,11 +125,6 @@ static void handle_can(void *p1, void *p2, void *p3)
 				CO_OD_RAM.pack_2.vbatt = 84;
 				CO_UNLOCK_OD();
 
-				/* Read inputs */
-				CO_process_RPDO(CO, syncWas);
-
-				/* Write outputs */
-				CO_process_TPDO(CO, syncWas, timeout * 1000U * 1000U);
 			}
 
 			reset = CO_process(CO, (uint16_t)elapsed, &timeout);
@@ -134,6 +133,12 @@ static void handle_can(void *p1, void *p2, void *p3)
 			}
 
 			if (timeout > 0) {
+				/* Read inputs */
+				CO_process_RPDO(CO, syncWas);
+
+				/* Write outputs */
+				CO_process_TPDO(CO, syncWas,  elapsed * 1000U);
+
 				k_sleep(K_MSEC(timeout));
 				elapsed = (uint32_t)k_uptime_delta(&timestamp);
 			} else {
