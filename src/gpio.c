@@ -25,6 +25,8 @@ LOG_MODULE_REGISTER(oresat_gpio_demo, LOG_LEVEL_INF);
 
 #define GPIO_SLEEP_TIME_MS 5000
 
+extern const k_tid_t gpio_id;
+
 /**************************************************/
 #if defined(CONFIG_BOARD_MCXN947_PROTOCARD)
 #define BP_NODE DT_NODELABEL(protogpios)
@@ -153,8 +155,6 @@ static const gpio_tp gpio_tp_array[NUM_GPIO_TPS] = {
 	GPIO_DEFS
 };
 #undef X
-
-extern const k_tid_t gpio_id;
 
 static int gpios_init(void)
 {

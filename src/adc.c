@@ -34,13 +34,13 @@ LOG_MODULE_REGISTER(oresat_adc, LOG_LEVEL_INF);
 #define AMPLIFIER_GAIN 40.96f
 
 /* MCXN947 core temperature slope factor */
-#define TEMP_A 771.0f
+#define TEMP_A 783.0f
 
 /* MCXN947 core temperature offset constant */
-#define TEMP_B 302.0f
+#define TEMP_B 297.0f
 
 /* MCXN947 bandgap constant */
-#define TEMP_alpha 10.06f
+#define TEMP_alpha 9.63f
 
 #define TEMP_AVERAGES 100
 
@@ -327,8 +327,9 @@ extern const k_tid_t adc_id;
 static int handle_adc(void *p1, void *p2, void *p3)
 {
 	int err;
-	int32_t adc_val[CHANNEL_COUNT];
-	uint32_t adc_raw[CHANNEL_COUNT];
+	int32_t adc_val[CHANNEL_COUNT] = {0};
+	uint32_t adc_raw[CHANNEL_COUNT] = {0};
+	int temp_count = 0;
 	float temp_vbe1 = 0.0f;
 	float temp_vbe8 = 0.0f;
 	float temp_vbe1_sum = 0.0f;
@@ -371,7 +372,7 @@ static int handle_adc(void *p1, void *p2, void *p3)
 				temperature = (TEMP_A * ad) / (temp_vbe8 + ad) - TEMP_B;
 				mark[0] = ',';
 				mark[1] = '*';
-				LOG_INF("%d, %d, %d, %d, %u, %u, %.2f, %.2f%s", adc_val[0], adc_val[1], adc_val[2], adc_val[3], temp_vbe1, temp_vbe8, (double)Iout, (double)temperature, mark);
+				LOG_INF("%d, %d, %d, %d, %.2f, %.2f, %.2f, %.2f%s", adc_val[0], adc_val[1], adc_val[2], adc_val[3], (double)temp_vbe1, (double)temp_vbe8, (double)Iout, (double)temperature, mark);
 			} else {
 				mark[0] = ' ';
 				mark[1] = ' ';
