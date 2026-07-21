@@ -28,19 +28,19 @@ LOG_MODULE_REGISTER(oresat_adc, LOG_LEVEL_INF);
 #define ADC_NODE0 DT_ALIAS(adc0)
 
 /* Rsense for MAX4211 */
-#define RSENSE_OHM 0.100
+#define RSENSE_OHM 0.100f
 
 /* Amplifier Gain for MAX4211 */
-#define AMPLIFIER_GAIN 40.96
+#define AMPLIFIER_GAIN 40.96f
 
 /* MCXN947 core temperature slope factor */
-#define TEMP_A 771
+#define TEMP_A 771.0f
 
 /* MCXN947 core temperature offset constant */
-#define TEMP_B 302
+#define TEMP_B 302.0f
 
 /* MCXN947 bandgap constant */
-#define TEMP_alpha 10.06
+#define TEMP_alpha 10.06f
 
 #define TEMP_AVERAGES 100
 
@@ -329,14 +329,13 @@ static int handle_adc(void *p1, void *p2, void *p3)
 	int err;
 	int32_t adc_val[CHANNEL_COUNT];
 	uint32_t adc_raw[CHANNEL_COUNT];
-	int32_t temp_vbe1 = 0;
-	int32_t temp_vbe8 = 0;
-	uint32_t temp_vbe1_sum = 0;
-	uint32_t temp_vbe8_sum = 0;
-	int32_t temp_count = 0;
-	double Iout;
-	double temperature = 0.0;
-	double ad;
+	float temp_vbe1 = 0.0f;
+	float temp_vbe8 = 0.0f;
+	float temp_vbe1_sum = 0.0f;
+	float temp_vbe8_sum = 0.0f;
+	float Iout;
+	float temperature = 0.0f;
+	float ad;
 	char mark[3] = {' ', ' ', '\0'};
 
 	k_thread_name_set(adc_id, "adc_thread");
@@ -365,14 +364,14 @@ static int handle_adc(void *p1, void *p2, void *p3)
 			if (++temp_count >= TEMP_AVERAGES) {
 				temp_vbe1 = temp_vbe1_sum / temp_count;
 				temp_vbe8 = temp_vbe8_sum / temp_count;
-				temp_vbe1_sum = 0;
-				temp_vbe8_sum = 0;
+				temp_vbe1_sum = 0.0f;
+				temp_vbe8_sum = 0.0f;
 				temp_count = 0;
 				ad = TEMP_alpha * (temp_vbe8 - temp_vbe1);
 				temperature = (TEMP_A * ad) / (temp_vbe8 + ad) - TEMP_B;
 				mark[0] = ',';
 				mark[1] = '*';
-				LOG_INF("%d, %d, %d, %d, %u, %u, %.2f, %.2f%s", adc_val[0], adc_val[1], adc_val[2], adc_val[3], temp_vbe1, temp_vbe8, Iout, temperature, mark);
+				LOG_INF("%d, %d, %d, %d, %u, %u, %.2f, %.2f%s", adc_val[0], adc_val[1], adc_val[2], adc_val[3], temp_vbe1, temp_vbe8, (double)Iout, (double)temperature, mark);
 			} else {
 				mark[0] = ' ';
 				mark[1] = ' ';
