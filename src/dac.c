@@ -23,7 +23,7 @@
 LOG_MODULE_REGISTER(oresat_dac_demo, LOG_LEVEL_DBG);
 
 /* size of stack area used by each thread */
-#define STACKSIZE 1024
+#define STACKSIZE 2048
 
 /* scheduling priority used by each thread */
 #define PRIORITY_DAC 6
@@ -43,7 +43,9 @@ LOG_MODULE_REGISTER(oresat_dac_demo, LOG_LEVEL_DBG);
 #define DAC_RESOLUTION 0
 #endif
 
-static int handle_dac(void)
+extern const k_tid_t dac_id;
+
+static int handle_dac(void *p1, void *p2, void *p3)
 {
 	int ret;
 	const struct device *const dac_dev = DEVICE_DT_GET(DAC_NODE);
@@ -57,6 +59,7 @@ static int handle_dac(void)
 	#endif /* CONFIG_DAC_BUFFER_NOT_SUPPORT */
 	};
 
+	k_thread_name_set(dac_id, "dac_thread");
 	LOG_INF("Starting DAC demo");
 
 	/* Can we use the DAC? */
@@ -79,7 +82,7 @@ static int handle_dac(void)
 	 * DACs. For DACs with lower resolution, sleep time needs to
 	 * be increased.
 	 */
-	const int sleep_time = (4096 / dac_values > 0 ? 4096 / dac_values : 1) * 100;
+	const int sleep_time = ((4096 / dac_values) > 0 ? (4096 / dac_values) : 1) * 1000;
 
 	LOG_DBG("Generating sawtooth signal at DAC channel %d.", DAC_CHANNEL_ID);
 	LOG_DBG("Number of DAC samples per cycle: %d, sleep time per sample (us): %d",

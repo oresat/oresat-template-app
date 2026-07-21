@@ -20,7 +20,7 @@
 LOG_MODULE_REGISTER(oresat_i2c_sensor_demo, LOG_LEVEL_DBG);
 
 /* size of stack area used by each thread */
-#define STACKSIZE 1024
+#define STACKSIZE 2048
 
 /* scheduling priority used by each thread */
 #define PRIORITY 7
@@ -58,12 +58,15 @@ SENSOR_DT_READ_IODEV(iodev, DT_COMPAT_GET_ANY_STATUS_OKAY(bosch_bme280),
 
 RTIO_DEFINE(ctx, 1, 1);
 
-static int handle_bme280(void)
+extern const k_tid_t bme280_id;
+
+static int handle_bme280(void *p1, void *p2, void *p3)
 {
 	int ret;
 	uint8_t buf[128];
 	const struct device *const bme_dev = DEVICE_DT_GET_ANY(bosch_bme280);
 
+	k_thread_name_set(bme280_id, "bme280_thread");
 	LOG_INF("Starting I2C sensor demo");
 
 	/* Can we use the I2C sensor? */

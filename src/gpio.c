@@ -15,7 +15,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/gpio.h>
 
-LOG_MODULE_REGISTER(oresat_gpio_demo, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(oresat_gpio_demo, LOG_LEVEL_INF);
 
 /* size of stack area used by each thread */
 #define STACKSIZE 1024
@@ -154,6 +154,8 @@ static const gpio_tp gpio_tp_array[NUM_GPIO_TPS] = {
 };
 #undef X
 
+extern const k_tid_t gpio_id;
+
 static int gpios_init(void)
 {
 	/**
@@ -193,7 +195,7 @@ static int gpios_log(void)
 {
 	/* enumerate all GPIOs and print their definitions as well as their currently read hardware value. */
 	for (int i = 0; i < NUM_GPIO_TPS; i++) {
-		LOG_INF("TP%d P%d_%d = %u", gpio_tp_array[i].tpnum, gpio_tp_array[i].port, gpio_tp_array[i].bit, gpio_pin_get_dt(&gpio_tp_array[i].dt));
+		LOG_DBG("TP%d P%d_%d = %u", gpio_tp_array[i].tpnum, gpio_tp_array[i].port, gpio_tp_array[i].bit, gpio_pin_get_dt(&gpio_tp_array[i].dt));
 	}
 	return 0;
 }
@@ -214,10 +216,11 @@ static int gpios_log(void)
 #endif
 
 
-static int handle_gpios(void)
+static int handle_gpios(void *p1, void *p2, void *p3)
 {
 	int ret;
 
+	k_thread_name_set(gpio_id, "gpio_thread");
 	LOG_INF("Starting GPIO demo");
 
 	/* Can we use the GPIOs? */

@@ -68,13 +68,21 @@ if BOARD_OVERLAY_PRESENT
 
 	if ADC_DEMO
 
+   	config ADC_THREAD
+   		bool "Control by the ADC thread; otherwise, use declarations in adc.h elsewhere"
+   		default y
+
 		config SEQUENCE_SAMPLES
 			int "Number of samples to be made on the sequence for each channel."
 			default 5
 
+   	config SEQUENCE_OVERSAMPLING
+   		int "Number of conversion results to average for each sample."
+   		default 7
+
 		config SEQUENCE_RESOLUTION
 			int "Set the resolution of the sequence readings."
-			default 12
+			default 16
 
 		config SEQUENCE_32BITS_REGISTERS
 			bool "ADC data sequences are on 32bits"

@@ -17,129 +17,372 @@
 #include <zephyr/drivers/adc.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_REGISTER(oresat_adc_demo, LOG_LEVEL_DBG);
-
-/* size of stack area used by each thread */
-#define STACKSIZE 1024
-
-/* scheduling priority used by each thread */
-#define PRIORITY 7
+LOG_MODULE_REGISTER(oresat_adc, LOG_LEVEL_INF);
 
 /* 1000 msec = 1 sec */
-#define ADC_SLEEP_TIME_MS 100 /* Use 5 to generate more data to graph samples that follow the DAC output */
+#define ADC_SLEEP_TIME_MS 50 /* Use 5 to generate more data to graph samples that follow the DAC output */
+
+#define MAX_ADC_READ_TRIES 10
 
 /* ADC node from the devicetree. */
-#define ADC_NODE DT_ALIAS(adc0)
+#define ADC_NODE0 DT_ALIAS(adc0)
+
+/* Rsense for MAX4211 */
+#define RSENSE_OHM 0.100
+
+/* Amplifier Gain for MAX4211 */
+#define AMPLIFIER_GAIN 40.96
+
+/* MCXN947 core temperature slope factor */
+#define TEMP_A 771
+
+/* MCXN947 core temperature offset constant */
+#define TEMP_B 302
+
+/* MCXN947 bandgap constant */
+#define TEMP_alpha 10.06
+
+#define TEMP_AVERAGES 100
 
 /* Auxiliary macro to obtain channel vref, if available. */
 #define CHANNEL_VREF(node_id) DT_PROP_OR(node_id, zephyr_vref_mv, 0)
 
 /* Data of ADC device specified in devicetree. */
-static const struct device *adc = DEVICE_DT_GET(ADC_NODE);
+static const struct device *adc_devs[] = {
+	DEVICE_DT_GET(ADC_NODE0),
+};
+#define ADC_DEV_COUNT ARRAY_SIZE(adc_devs)
 
 /* Data array of ADC channels for the specified ADC. */
-static const struct adc_channel_cfg channel_cfgs[] = {
-	DT_FOREACH_CHILD_SEP(ADC_NODE, ADC_CHANNEL_CFG_DT, (,))};
+static const struct adc_channel_cfg channel_cfgs_dev_0[] = {
+	DT_FOREACH_CHILD_SEP(ADC_NODE0, ADC_CHANNEL_CFG_DT, (,))
+};
+#define CHANNEL_COUNT_DEV_0 ARRAY_SIZE(channel_cfgs_dev_0)
+#define CHANNEL_COUNT_DEV_1 0
+#define CHANNEL_COUNT (CHANNEL_COUNT_DEV_0 + CHANNEL_COUNT_DEV_1)
+#define MAX_CHANNEL_DEV_COUNT MAX(CHANNEL_COUNT_DEV_0, CHANNEL_COUNT_DEV_1)
+static const struct adc_channel_cfg *adc_channel_cfgs[ADC_DEV_COUNT] = {
+	channel_cfgs_dev_0
+};
+static int adc_channel_counts[ADC_DEV_COUNT] = {
+	CHANNEL_COUNT_DEV_0
+};
 
 /* Data array of ADC channel voltage references. */
-static uint32_t vrefs_mv[] = {DT_FOREACH_CHILD_SEP(ADC_NODE, CHANNEL_VREF, (,))};
+static uint32_t vrefs_mv_dev_0[] = {
+	DT_FOREACH_CHILD_SEP(ADC_NODE0, CHANNEL_VREF, (,))
+};
+#define ADC_VREF_DEV_0_COUNT ARRAY_SIZE(vrefs_mv_dev_0)
+#define ADC_VREF_DEV_1_COUNT 0
+#define ADC_VREF_COUNT (ADC_VREF_DEV_0_COUNT + ADC_VREF_DEV_1_COUNT)
+#define MAX_ADC_VREF_COUNT MAX(ADC_VREF_DEV_0_COUNT, ADC_VREF_DEV_1_COUNT)
+static int adc_vref_counts[ADC_DEV_COUNT] = {
+	ADC_VREF_DEV_0_COUNT
+};
+static uint32_t *adc_vref_mvs[] = {
+	vrefs_mv_dev_0
+};
 
-/* Get the number of channels defined on the DTS. */
-#define CHANNEL_COUNT ARRAY_SIZE(channel_cfgs)
+struct adc_info; // forward decl
 
-static int handle_adc(void)
-{
-	int err;
+// structure to tie together various Zephyr device structures and adc structures
+typedef struct adc_dev_info {
+	const struct device *dev;
+	uint32_t num_vrefs;
+	uint32_t *vrefs_mv;						// pointer to an array of num_vrefs uint32_t mV values
+	uint32_t num_ch;						// number used in the adc_channel_cfg array
+	const struct adc_channel_cfg *config;	// pointer to num_ch adc_channel_cfg structures
+	struct adc_sequence sequence;
 #ifdef CONFIG_SEQUENCE_32BITS_REGISTERS
 	uint32_t channel_reading[CONFIG_SEQUENCE_SAMPLES][CHANNEL_COUNT];
 #else
 	uint16_t channel_reading[CONFIG_SEQUENCE_SAMPLES][CHANNEL_COUNT];
 #endif
+} adc_dev_info;
 
-	/* Options for the sequence sampling. */
-	const struct adc_sequence_options options = {
-		.extra_samplings = CONFIG_SEQUENCE_SAMPLES - 1,
-		.interval_us = 0,
-	};
+static adc_dev_info adc_dev_infos[ADC_DEV_COUNT];
 
-	/* Configure the sampling sequence to be made. */
-	struct adc_sequence sequence = {
-		.buffer = channel_reading,
-		/* buffer size in bytes, not number of samples */
-		.buffer_size = sizeof(channel_reading),
-		.resolution = CONFIG_SEQUENCE_RESOLUTION,
-		.options = &options,
-	};
+// structure to map the user interface to this file to the multiple adc devices and their channels
+// this allows the user to specify adc_num 0, 1, or 2, and have them map properly to the interals
+typedef struct adc_info {
+	adc_dev_info *adcdev;
+	uint16_t adc_dev_num;	// number of the ADC device (index into adc_devs[])
+	uint16_t ch_num;		// number of the channel on that device
+} adc_info;
 
-	LOG_INF("Starting ADC demo");
+static adc_info adc_info_map[CHANNEL_COUNT];
 
-	if (!device_is_ready(adc)) {
-		LOG_ERR("ADC controller device %s not ready", adc->name);
-		return 0;
+// Renumber the outside interface to match reality (adc number 0 and 2 seem swapped somewhere.
+// TODO: fix.
+static int log_to_phys[CHANNEL_COUNT];
+
+/* Options for the sequence sampling. */
+static const struct adc_sequence_options options = {
+	.extra_samplings = CONFIG_SEQUENCE_SAMPLES - 1,
+	.interval_us = 0,
+};
+
+static void init_adc_info(void)
+{
+	LOG_DBG("Mapping ADC info...");
+	LOG_DBG("ADC_DEV_COUNT:%d, CH_CNT_D0:%d, CH_CNT_D1:%d, CH_CNT:%d, MAX_CH_CNT:%d",
+			ADC_DEV_COUNT, CHANNEL_COUNT_DEV_0, CHANNEL_COUNT_DEV_1, CHANNEL_COUNT, MAX_CHANNEL_DEV_COUNT);
+	LOG_DBG("ADC_VREF_D0:%d, ADC_VREF_D1:%d, ADC_VREF_COUNT:%d",
+			ADC_VREF_DEV_0_COUNT, ADC_VREF_DEV_1_COUNT, ADC_VREF_COUNT);
+
+	uint32_t channel_bitmask;
+	adc_dev_info *padi = adc_dev_infos;
+	int adc_index = 0; // index into adc_info_map
+	int i;
+	int j;
+
+	for (i = 0; i < ADC_DEV_COUNT; i++) {
+		padi->dev = adc_devs[i];
+		padi->num_vrefs = adc_vref_counts[i];
+		padi->vrefs_mv = adc_vref_mvs[i];
+		padi->num_ch = adc_channel_counts[i];
+		padi->config = adc_channel_cfgs[i];
+
+		channel_bitmask = 0;
+		for (j = 0; j < padi->num_ch; j++) {
+			channel_bitmask |= BIT(padi->config[j].channel_id);
+			adc_info_map[adc_index].adcdev = padi;
+			adc_info_map[adc_index].adc_dev_num = i;
+			adc_info_map[adc_index].ch_num = j;
+			adc_index++;
+		}
+
+		padi->sequence.options = &options;
+		padi->sequence.channels = channel_bitmask;
+		padi->sequence.buffer = padi->channel_reading;
+		padi->sequence.buffer_size = sizeof(padi->channel_reading);
+		padi->sequence.resolution = CONFIG_SEQUENCE_RESOLUTION;
+		padi->sequence.oversampling = CONFIG_SEQUENCE_OVERSAMPLING;
+		padi->sequence.calibrate = 0;
+
+		LOG_DBG("ADC%d (%s): num_vrefs:%u, num_ch:%u, bitmask:0x%08x, res:%u, ave:%u, buf:%p, buf_size:%d",
+				i, padi->dev->name, padi->num_vrefs, padi->num_ch, padi->sequence.channels,
+				padi->sequence.resolution, padi->sequence.oversampling,
+				padi->sequence.buffer, padi->sequence.buffer_size);
+
+		padi++;
 	}
+
+#if defined(CONFIG_BOARD_MCXN947_MAG_CARD)
+	if (adc_index == 3) {
+		log_to_phys[0] = 2;
+		log_to_phys[1] = 1;
+		log_to_phys[2] = 0;
+	}
+#else 
+	for (i = 0; i < adc_index; i++) {
+		log_to_phys[i] = i;
+	}
+#endif
+	for (i = 0; i < adc_index; i++) {
+		LOG_DBG("adc_info_map[%d]: padi:%p, logidx:%d, physidx:%d, dev:%d",
+				i, adc_info_map[i].adcdev, i, log_to_phys[i], adc_info_map[i].adc_dev_num);
+	}
+}
+
+int get_num_adc_channels(void)
+{
+	return CHANNEL_COUNT;
+}
+
+int init_adc(void)
+{
+	int err = 0;
+	const struct device *adc;
+	adc_dev_info *padi;
+	const struct adc_channel_cfg *config;
+	int i;
+	int j;
+
+	init_adc_info();
 
 	LOG_INF("Channels: %d, sequence samples: %d, resolution: %d",
 		   CHANNEL_COUNT, CONFIG_SEQUENCE_SAMPLES, CONFIG_SEQUENCE_RESOLUTION);
 
-	/* Configure channels individually prior to sampling. */
-	for (size_t i = 0U; i < CHANNEL_COUNT; i++) {
-		sequence.channels |= BIT(channel_cfgs[i].channel_id);
-		err = adc_channel_setup(adc, &channel_cfgs[i]);
-		if (err < 0) {
-			LOG_ERR("Could not setup channel #%d (%d)\n", i, err);
-			return 0;
-		}
-		if ((vrefs_mv[i] == 0) && (channel_cfgs[i].reference == ADC_REF_INTERNAL)) {
-			vrefs_mv[i] = adc_ref_internal(adc);
-		}
-		#ifdef CONFIG_ADC_CONFIGURABLE_INPUTS
-		LOG_INF("Channel: %u, vref_mv: %u, gain: %u, acq time: %u, diff: %u, inp_pos: %u, inp_neg: %u",
-				channel_cfgs[i].channel_id, vrefs_mv[i], channel_cfgs[i].gain, channel_cfgs[i].acquisition_time,
-				channel_cfgs[i].differential, channel_cfgs[i].input_positive, channel_cfgs[i].input_negative);
-		#else
-		LOG_INF("Channel: %u, vref_mv: %u, gain: %u, acq time: %u, diff: %u",
-				channel_cfgs[i].channel_id, vrefs_mv[i], channel_cfgs[i].gain, channel_cfgs[i].acquisition_time,
-				channel_cfgs[i].differential);
-		#endif
-	}
-
-	while (1) {
-		k_msleep(ADC_SLEEP_TIME_MS);
-
-		err = adc_read(adc, &sequence);
-		if (err < 0) {
-			LOG_ERR("Could not read (%d)", err);
+	for (i = 0U; i < ADC_DEV_COUNT; i++) {
+		adc = adc_devs[i];
+		if (!device_is_ready(adc)) {
+			LOG_ERR("ADC controller device %s not ready", adc->name);
+			err = -ENODEV;
 			continue;
 		}
+		padi = &adc_dev_infos[i];
+		LOG_INF("Init adc%d: %s, num_ch:%d, num_vref:%d", i, adc->name, padi->num_ch, padi->num_vrefs);
+	}
 
-		for (size_t channel_index = 0U; channel_index < CHANNEL_COUNT; channel_index++) {
-			int32_t raw;
-			int32_t val_mv;
-
-			printk("Channel %" PRId32 ":", channel_index);
-
-			for (size_t sample_index = 0U; sample_index < CONFIG_SEQUENCE_SAMPLES;
-			     sample_index++) {
-
-				raw = channel_reading[sample_index][channel_index];
-				val_mv = raw;
-
-				err = adc_raw_to_millivolts(vrefs_mv[channel_index],
-							    channel_cfgs[channel_index].gain,
-							    CONFIG_SEQUENCE_RESOLUTION, &val_mv);
-
-				/* conversion to mV may not be supported, skip if not */
-				if ((err < 0) || vrefs_mv[channel_index] == 0) {
-					printk("% 4" PRId32 ",", raw);
-				} else {
-					printk("% 4" PRId32 ",", val_mv);
-				}
+	for (i = 0U; i < ADC_DEV_COUNT; i++) {
+		adc = adc_devs[i];
+		padi = &adc_dev_infos[i];
+		for (j = 0; j < padi->num_ch; j++) {
+			LOG_INF("  Init ch:%d", j);
+			config = &padi->config[j];
+			err = adc_channel_setup(adc, &padi->config[j]);
+			if (err < 0) {
+				LOG_ERR("Could not setup channel #%d (%d)\n", i, err);
+				return 0;
 			}
-			printk("\n");
+			#ifdef CONFIG_ADC_CONFIGURABLE_INPUTS
+			LOG_INF("  Channel: %u, gain: %u, acq time: %u, diff: %u, inp_pos: %u, inp_neg: %u",
+					config->channel_id, config->gain, config->acquisition_time,
+					config->differential, config->input_positive, config->input_negative);
+			#else
+			LOG_INF("  Channel: %u, gain: %u, acq time: %u, diff: %u",
+					config->channel_id, config->gain, config->acquisition_time,
+					config->differential);
+			#endif
+		}
+
+		for (int k = 0; k < padi->num_vrefs; padi++) {
+			if ((padi->vrefs_mv[k] == 0) && (padi->config->reference == ADC_REF_INTERNAL)) {
+				padi->vrefs_mv[k] = adc_ref_internal(adc);
+			}
+			LOG_INF("  Vref: %u, vref_mv: %u", k, padi->vrefs_mv[k]);
 		}
 	}
+	return err;
+}
+
+int acquire_adc_readings(void)
+{
+	int err;
+	int i;
+	int count = 0;
+	adc_dev_info *padi = adc_dev_infos;
+
+	for (i = 0; i < ADC_DEV_COUNT; i++) {
+		LOG_DBG("Requesting read from adc%d", i);
+		do {
+			err = adc_read(padi->dev, &padi->sequence);
+			if (err < 0) {
+				k_sleep(K_MSEC(100));
+				//LOG_ERR("Could not read (%d)", err);
+			}
+		} while (err && (count++ < MAX_ADC_READ_TRIES));
+		if (err) {
+			LOG_ERR("Failed to read after %d tries; error %d", count, err);
+		}
+		padi++;
+	}
+	return err;
+}
+
+int read_adc(unsigned int log_adc_num, int32_t *val_mv, uint32_t *val_raw)
+{
+	int err;
+	int num_samples = 0;
+	int32_t val_tmp;
+	uint32_t val_raw_sum = 0;
+	adc_info *info;
+	adc_dev_info *padi;
+	int phys_adc_num = log_to_phys[log_adc_num];
+
+	if (log_adc_num >= CHANNEL_COUNT) {
+		LOG_ERR("Incorrect adc number set:%u; max is:%u", log_adc_num, CHANNEL_COUNT);
+		return -ENODEV;
+	}
+	info = &adc_info_map[phys_adc_num];
+	padi = info->adcdev;
+
+	*val_mv = 0;
+
+	LOG_DBG("Reading log_adc_num:%d, phys_num:%d, dev_num:%d (%s), ch_num:%d",
+			log_adc_num, phys_adc_num, info->adc_dev_num, padi->dev->name, info->ch_num);
+
+	for (size_t sample_index = 0U; sample_index < CONFIG_SEQUENCE_SAMPLES; sample_index++) {
+		val_raw_sum += padi->channel_reading[sample_index][info->ch_num];
+		num_samples++;
+	}
+	*val_raw = val_raw_sum / num_samples;
+	val_tmp = *val_raw;
+
+	err = adc_raw_to_millivolts(padi->vrefs_mv[info->ch_num],
+								padi->config->gain,
+								CONFIG_SEQUENCE_RESOLUTION, &val_tmp);
+	if (err) {
+		*val_mv = 0;
+		LOG_ERR("Error converting raw adc to mV: %d", err);
+		return -ENODATA;
+	}
+
+	*val_mv = val_tmp;
+	LOG_DBG("mV: %d, raw: %u", *val_mv, *val_raw);
 
 	return 0;
 }
 
+#if defined(CONFIG_ADC_THREAD)
+/* size of stack area used by each thread */
+#define STACKSIZE 2048
+
+/* scheduling priority used by each thread */
+#define PRIORITY 7
+
+extern const k_tid_t adc_id;
+
+static int handle_adc(void *p1, void *p2, void *p3)
+{
+	int err;
+	int32_t adc_val[CHANNEL_COUNT];
+	uint32_t adc_raw[CHANNEL_COUNT];
+	int32_t temp_vbe1 = 0;
+	int32_t temp_vbe8 = 0;
+	uint32_t temp_vbe1_sum = 0;
+	uint32_t temp_vbe8_sum = 0;
+	int32_t temp_count = 0;
+	double Iout;
+	double temperature = 0.0;
+	double ad;
+	char mark[3] = {' ', ' ', '\0'};
+
+	k_thread_name_set(adc_id, "adc_thread");
+	LOG_INF("Starting ADC thread");
+
+	err = init_adc();
+	if (err) {
+		k_sleep(K_MSEC(1000));
+		return 0;
+	}
+
+	LOG_INF("ch0-mV, ch1-mV, ch2-mV, ch3-mV, vbe1, vbe8, max4211 Iout mA, Vcore (C)");
+
+	for (;;) {
+		err = acquire_adc_readings();
+		if (!err) {
+			LOG_DBG("Acquired readings");
+
+			for (unsigned int adc_num = 0; adc_num < CHANNEL_COUNT; adc_num++) {
+				err = read_adc(adc_num, &adc_val[adc_num], &adc_raw[adc_num]);
+			}
+			Iout = adc_val[0] / (RSENSE_OHM * AMPLIFIER_GAIN); // current in mA
+
+			temp_vbe1_sum += adc_raw[CHANNEL_COUNT - 2];
+			temp_vbe8_sum += adc_raw[CHANNEL_COUNT - 1];
+			if (++temp_count >= TEMP_AVERAGES) {
+				temp_vbe1 = temp_vbe1_sum / temp_count;
+				temp_vbe8 = temp_vbe8_sum / temp_count;
+				temp_vbe1_sum = 0;
+				temp_vbe8_sum = 0;
+				temp_count = 0;
+				ad = TEMP_alpha * (temp_vbe8 - temp_vbe1);
+				temperature = (TEMP_A * ad) / (temp_vbe8 + ad) - TEMP_B;
+				mark[0] = ',';
+				mark[1] = '*';
+				LOG_INF("%d, %d, %d, %d, %u, %u, %.2f, %.2f%s", adc_val[0], adc_val[1], adc_val[2], adc_val[3], temp_vbe1, temp_vbe8, Iout, temperature, mark);
+			} else {
+				mark[0] = ' ';
+				mark[1] = ' ';
+			}
+
+			k_sleep(K_MSEC(1000 / TEMP_AVERAGES));
+		}
+	}
+	return 0;
+}
+
 K_THREAD_DEFINE(adc_id, STACKSIZE, handle_adc, NULL, NULL, NULL, PRIORITY, 0, 0);
+#endif

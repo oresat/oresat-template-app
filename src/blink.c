@@ -16,7 +16,7 @@
 #include <zephyr/devicetree.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_REGISTER(oresat_blink_demo, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(oresat_blink_demo, LOG_LEVEL_INF);
 
 /* size of stack area used by each thread */
 #define STACKSIZE 1024
@@ -30,11 +30,14 @@ LOG_MODULE_REGISTER(oresat_blink_demo, LOG_LEVEL_DBG);
 /* The devicetree node identifier for the "led0" alias. */
 #define LED0_NODE DT_ALIAS(led0)
 
-static int handle_blink(void)
+extern const k_tid_t blink_id;
+
+static int handle_blink(void *p1, void *p2, void *p3)
 {
 	int ret;
 	const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
+	k_thread_name_set(blink_id, "blink_thread");
 	LOG_INF("Starting blink demo");
 
 	/* Can we use the LED? */
