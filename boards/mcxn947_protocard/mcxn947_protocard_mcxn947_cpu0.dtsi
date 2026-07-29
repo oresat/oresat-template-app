@@ -28,6 +28,7 @@
 	oresat_demo: oresat-demo-enabled {}; /* Enable demos for supported boards */
 
 	chosen {
+        zephyr,system-timer-companion = &lptmr0;
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash;
 		zephyr,flash-controller = &fmu;
@@ -361,6 +362,8 @@
 
 &lptmr0 {
 	status = "okay";
+	clock-frequency = <16384>;
+	timer-mode-sel = <0>;
 };
 
 &flexio0 {
