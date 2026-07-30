@@ -366,6 +366,10 @@
 	timer-mode-sel = <0>;
 };
 
+&powerdown {
+    status = "disabled";
+};
+
 &flexio0 {
 	status = "okay";
 };

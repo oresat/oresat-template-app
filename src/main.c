@@ -28,7 +28,7 @@ const struct pm_state_info *pm_policy_next_state(uint8_t cpu, int32_t ticks)
         return NULL;   //No state available
     }
 
-// Loop through all available states 
+// Loop through all available states
     for (int i = 0; i < num_states; i++) {
 
         printk("Checking state %d (enum value = %d)\n",
