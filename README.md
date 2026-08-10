@@ -219,6 +219,8 @@ If you have previously installed probe-rs and are on an old version (v<0.32), ma
 
 Flash the build using `west flash`.
 
+To fully erase before flashing, do `west flash --erase`
+
 Note: the CMakeLists.txt file sets the `BOARD_ROOT` so that it does not
 need to be specified on the command line.
 
