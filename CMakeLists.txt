@@ -25,7 +25,8 @@ set_property(GLOBAL APPEND
     PROPERTY CMAKE_CONFIGURE_DEPENDS
     "${CMAKE_SOURCE_DIR}/.git/index")
 
-#
+set(BOARD_FLASH_RUNNER "probe-rs")
+
 # utilize settings to autogenerate a header file to adjust the build inside the C code
 #
 configure_file (

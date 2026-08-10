@@ -210,10 +210,16 @@ Ensure you are in the `template` directory (`cd src/oresat/firmware/apps/templat
 | mcxn947_protocard | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 -- -DCONFIG_MCUBOOT_ALLOWED=n` |
 | mcxn947_protocard with MCUboot | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 --sysbuild -- -DBOARD_ROOT=$PWD` |
 
-Flash the build using `west flash`. The Oresat Card Debug Board works with `pyocd` as the runner and with proper configuration
-of The PyOCD pack `NXP.MCXN947_DFP.19.0.0.pack`. Note that more recent versions do not work.
+#### Flashing
 
-`$ west flash -r pyocd`
+Flashing is done via [probe-rs](probe.rs). Follow their [installation instructions](https://probe.rs/docs/getting-started/installation/).
+Once installed, follow their [probe setup instructions](https://probe.rs/docs/getting-started/probe-setup/).
+
+If you have previously installed probe-rs and are on an old version (v<0.32), make sure you follow their uninstalling procedure and use their most up-to-date release.
+
+Flash the build using `west flash`.
+
+To fully erase before flashing, do `west flash --erase`
 
 Note: the CMakeLists.txt file sets the `BOARD_ROOT` so that it does not
 need to be specified on the command line.
