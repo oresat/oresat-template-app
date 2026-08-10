@@ -228,6 +228,30 @@ Logging is outputted over UART and [RTT](https://www.segger.com/products/debug-p
 
 To see RTT output run `west attach -r probe-rs`
 
+After running the above command for the blinky app you should see the following output:
+
+```bash
+(.venv) < <oresat-zephyr> ~/src/oresat/firmware/apps/template % west attach -r probe-rs
+-- west attach: rebuilding
+ninja: no work to do.
+-- west attach: using runner probe-rs
+-- runners.probe-rs: reset after flashing requested
+-- runners.probe-rs: Starting RTT session
+ WARN probe_rs::rtt: Buffer for up channel 1 not initialized
+ WARN probe_rs::rtt: Buffer for up channel 2 not initialized
+ WARN probe_rs::rtt: Buffer for down channel 1 not initialized
+ WARN probe_rs::rtt: Buffer for down channel 2 not initialized
+[00:00:43.486,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+23:17:53.990: [00:00:44.493,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+23:17:53.990: [00:00:45.501,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+23:17:53.990: [00:00:46.509,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+23:17:54.095: [00:00:47.517,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+23:17:55.018: [00:00:48.525,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+23:17:56.046: [00:00:49.532,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+23:17:57.071: [00:00:50.540,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+Terminal>
+```
+
 ### Behavior
 
 After flashing, the LED starts to blink and messages with the current LED state,
