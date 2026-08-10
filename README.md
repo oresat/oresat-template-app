@@ -222,6 +222,12 @@ Flash the build using `west flash`.
 Note: the CMakeLists.txt file sets the `BOARD_ROOT` so that it does not
 need to be specified on the command line.
 
+### Logging
+
+Logging is outputted over UART and [RTT](https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/).
+
+To see RTT output run `west attach -r probe-rs`
+
 ### Behavior
 
 After flashing, the LED starts to blink and messages with the current LED state,
