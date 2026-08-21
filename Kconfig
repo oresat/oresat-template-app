@@ -82,7 +82,7 @@ if BOARD_OVERLAY_PRESENT
 
 	endif  # ADC_DEMO
 
-	if CAN_DEMO && !SOC_STM32F091XC
+	if CAN_DEMO && !SOC_STM32F091XC && !ARCH_POSIX
 
 		config MCUBOOT_ALLOWED
 			bool "MCUboot allowed."

@@ -6,9 +6,14 @@
  * Modified slightly to run as a thread and use logging.
  */
 
+#ifdef CONFIG_ADC_EMUL
+#include <zephyr/drivers/adc/adc_emul.h>
+#include <math.h>
+#endif /* ifdef CONFIG_ADC_EMUL */
+
 #include <stdio.h>
 #include <zephyr/kernel.h>
-#include <zephyr/sys/printk.h> 
+#include <zephyr/sys/printk.h>
 #include <zephyr/sys/__assert.h>
 
 #include <zephyr/device.h>
@@ -103,8 +108,18 @@ static int handle_adc(void)
 		#endif
 	}
 
+#ifdef CONFIG_ADC_EMUL
+	uint32_t adc_val = 0;
+#endif /* ifdef CONFIG_ADC_EMUL */
+
 	while (1) {
 		k_msleep(ADC_SLEEP_TIME_MS);
+
+#ifdef CONFIG_ADC_EMUL
+		uint32_t adc_raw = (uint32_t)((sin(adc_val) + 1) * 1000);
+		adc_emul_const_raw_value_set(adc, 0, adc_raw);
+		adc_val++;
+#endif /* ifdef CONFIG_ADC_EMUL */
 
 		err = adc_read(adc, &sequence);
 		if (err < 0) {
