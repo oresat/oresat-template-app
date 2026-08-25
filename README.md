@@ -228,29 +228,34 @@ need to be specified on the command line.
 
 Logging is outputted over UART and [RTT](https://www.segger.com/products/debug-probes/j-link/technology/about-real-time-transfer/).
 
-To see RTT output run `west attach -r probe-rs`
+To see RTT output run `west rtt`
 
 After running the above command for the blinky app you should see the following output:
 
 ```bash
-(.venv) < <oresat-zephyr> ~/src/oresat/firmware/apps/template % west attach -r probe-rs
--- west attach: rebuilding
+(.venv) <oresat-zephyr> ~/src/oresat/firmware/apps/template % west rtt
+-- west rtt: rebuilding
 ninja: no work to do.
--- west attach: using runner probe-rs
+-- west rtt: using runner probe-rs
 -- runners.probe-rs: reset after flashing requested
 -- runners.probe-rs: Starting RTT session
  WARN probe_rs::rtt: Buffer for up channel 1 not initialized
  WARN probe_rs::rtt: Buffer for up channel 2 not initialized
  WARN probe_rs::rtt: Buffer for down channel 1 not initialized
  WARN probe_rs::rtt: Buffer for down channel 2 not initialized
-[00:00:43.486,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
-23:17:53.990: [00:00:44.493,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
-23:17:53.990: [00:00:45.501,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
-23:17:53.990: [00:00:46.509,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
-23:17:54.095: [00:00:47.517,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
-23:17:55.018: [00:00:48.525,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
-23:17:56.046: [00:00:49.532,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
-23:17:57.071: [00:00:50.540,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+[00:00:00.000,000] <dbg> can_mcux_flexcan: mcux_flexcan_init: Message Buffers: 32, RX MB: 13, TX MB: 19
+17:32:08.144: [00:00:00.009,000] <dbg> can_mcux_flexcan: mcux_flexcan_init: Presc: 3, Seg1S1: 6, Seg2: 4
+17:32:08.144: [00:00:00.018,000] <dbg> can_mcux_flexcan: mcux_flexcan_init: Sample-point err : 0
+17:32:08.144: [00:00:00.028,000] <dbg> BME280: bme280_chip_init: ID read failed: -5
+17:32:08.144: *** Booting Zephyr OS build v4.4.1 ***
+17:32:08.144: [00:00:00.039,000] <inf> oresat_zephyr_template: Oresat Template App
+17:32:08.144: [00:00:00.045,000] <inf> oresat_zephyr_template:    Oresat   Board: mcxn947_protocard/mcxn947/cpu0
+17:32:08.144: [00:00:00.055,000] <dbg> hwinfo_cmc: z_impl_hwinfo_get_reset_cause: sources = 0x00004214, cause = 0x00000026
+17:32:08.144: [00:00:00.065,000] <dbg> hwinfo_cmc: z_impl_hwinfo_clear_reset_cause: sources = 0x00004214
+17:32:08.144: [00:00:00.074,000] <inf> oresat_zephyr_template:     Chip     HWID:
+[00:00:02.151,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking! 7a 35  ca 50 e5 a5 90 29 57 4f |...w_=z5 .P...)WO
+17:32:09.886: [00:00:03.158,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
+17:32:10.810: [00:00:04.166,000] <dbg> oresat_blink_demo: handle_blink: The light is blinking!
 Terminal>
 ```
 
