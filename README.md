@@ -233,7 +233,7 @@ To see RTT output run `west rtt`
 After running the above command for the blinky app you should see the following output:
 
 ```bash
-(.venv) < <oresat-zephyr> ~/src/oresat/firmware/apps/template % west rtt
+(.venv) <oresat-zephyr> ~/src/oresat/firmware/apps/template % west rtt
 -- west rtt: rebuilding
 ninja: no work to do.
 -- west rtt: using runner probe-rs
