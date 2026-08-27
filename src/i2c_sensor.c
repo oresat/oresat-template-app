@@ -20,7 +20,7 @@
 LOG_MODULE_REGISTER(oresat_i2c_sensor_demo, LOG_LEVEL_DBG);
 
 /* size of stack area used by each thread */
-#define STACKSIZE 1024
+#define STACKSIZE 2048
 
 /* scheduling priority used by each thread */
 #define PRIORITY 7
