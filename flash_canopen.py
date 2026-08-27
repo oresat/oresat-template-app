@@ -7,13 +7,13 @@ from pathlib import Path
 
 import canopen
 
-DEFAULT_SERIAL_PORT = "/dev/cu.usbmodem101"
+DEFAULT_SERIAL_PORT = "can0"
 DEFAULT_CHANNEL = DEFAULT_SERIAL_PORT
 DEFAULT_BITRATE = 1_000_000
 DEFAULT_NODE_ID = 0x7C
-DEFAULT_BIN_PATH = Path("build-sysbuild/template/zephyr/zephyr.signed.bin")
+DEFAULT_BIN_PATH = Path("build/oresat-template-app/zephyr/zephyr.signed.bin")
 
-DEFAULT_BLOCK_TRANSFER = False
+DEFAULT_BLOCK_TRANSFER = True
 DEFAULT_DOWNLOAD_BUFFER_SIZE = 889
 DEFAULT_STATUS_TIMEOUT_S = 30.0
 DEFAULT_BOOTUP_TIMEOUT_S = 20.0
@@ -22,7 +22,7 @@ DEFAULT_SDO_RETRIES = 3
 DEFAULT_CONFIRM_IMAGE = False
 
 DEFAULT_REQUEST_CRC = False
-DEFAULT_THROTTLE_DELAY_S = 0.0001
+DEFAULT_THROTTLE_DELAY_S = 0.000001
 
 H1F50_PROGRAM_DATA = 0x1F50
 H1F51_PROGRAM_CTRL = 0x1F51
@@ -109,6 +109,7 @@ def wait_flash_status_ok(flash_sdo, timeout_s):
 
 
 def main():
+    start_time = time.perf_counter()
     args = parse_args()
 
     if args.debug:
@@ -123,12 +124,13 @@ def main():
 
     if not bin_path.is_file():
         logging.error(f"Binary not found: {bin_path}")
+        print(f"main() took {time.perf_counter() - start_time:.2f} seconds")
         return 1
 
     size = os.path.getsize(bin_path)
 
     network = canopen.Network()
-    network.connect(interface="slcan", channel=channel, bitrate=args.bitrate)
+    network.connect(interface="socketcan", channel=DEFAULT_SERIAL_PORT, bitrate=args.bitrate)
 
     if args.block_transfer:
         original_send = network.bus.send
@@ -160,6 +162,7 @@ def main():
     if status != 0:
         logging.error(f"CLEAR failed, flash status=0x{status:08X}")
         network.disconnect()
+        print(f"main() took {time.perf_counter() - start_time:.2f} seconds")
         return 2
 
     with open(bin_path, "rb") as infile:
@@ -177,6 +180,7 @@ def main():
     if status != 0:
         logging.error(f"Download failed, flash status=0x{status:08X}")
         network.disconnect()
+        print(f"main() took {time.perf_counter() - start_time:.2f} seconds")
         return 3
 
     logging.info(f"Software ID after download: 0x{int(swid_sdo.raw):08X}")
@@ -192,6 +196,7 @@ def main():
         ctrl_sdo.raw = PROGRAM_CTRL_ZEPHYR_CONFIRM
 
     network.disconnect()
+    print(f"main() took {time.perf_counter() - start_time:.2f} seconds")
     return 0
 
 
