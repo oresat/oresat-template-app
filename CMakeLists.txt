@@ -3,10 +3,10 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 list(APPEND BOARD_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-set(BOARD "frdm_mcxn947/mcxn947/cpu0")
+set(BOARD "mcxn947_protocard/mcxn947/cpu0")
 
 set(VERSION_MAJOR "1")
-set(VERSION_MINOR "0")
+set(VERSION_MINOR "1")
 set(PATCHLEVEL "0")
 set(VERSION_TWEAK "0")
 set(EXTRAVERSION "00000000")

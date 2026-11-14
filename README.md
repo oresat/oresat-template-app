@@ -207,8 +207,8 @@ Ensure you are in the `template` directory (`cd src/oresat/firmware/apps/templat
 | FRDM-MCXN947  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 -- -DCONFIG_MCUBOOT_ALLOWED=n` |
 | FRDM-MCXN947 with MCUboot  | `west build -p always -b frdm_mcxn947/mcxn947/cpu0 --sysbuild` |
 | NUCLEO-R091RC | `west build -p always -b nucleo_f091rc`             |
-| mcxn947_protocard | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 -- -DCONFIG_MCUBOOT_ALLOWED=n` |
-| mcxn947_protocard with MCUboot | `west build -p always -b mcxn947_protocard/mcxn947/cpu0 --sysbuild -- -DBOARD_ROOT=$PWD` |
+| mcxn947_protocard (default) | `west build -p always -- -DCONFIG_MCUBOOT_ALLOWED=n` |
+| mcxn947_protocard with MCUboot | `west build -p always --sysbuild` |
 
 #### Flashing
 
@@ -441,7 +441,7 @@ More information on the application and adding other boards can be found in [Ore
 
 Please follow the installation steps in [Oresat Zephyr Setup].
 
-[Oresat Zephyr Setup]:https://github.com/oresat/oresat-firmware/blob/zephyr/README.md
+[Oresat Zephyr Setup]:https://github.com/oresat/oresat-firmware/blob/main/README.md
 [Oresat MCXN947 Demo]:https://github.com/plskeggs/oresat-mcxn947-demo/blob/feature-demo-other-hardware/README.md
 
 ### Todo
