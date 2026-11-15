@@ -130,7 +130,10 @@ def main():
     size = os.path.getsize(bin_path)
 
     network = canopen.Network()
-    network.connect(interface="socketcan", channel=DEFAULT_SERIAL_PORT, bitrate=args.bitrate)
+    try:
+        network.connect(interface="socketcan", channel=channel, bitrate=args.bitrate)
+    except:
+        network.connect(interface="slcan", channel=channel, bitrate=args.bitrate)
 
     if args.block_transfer:
         original_send = network.bus.send
