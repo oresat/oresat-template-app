@@ -15,8 +15,8 @@
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/hwinfo.h>
 #include <zephyr/logging/log.h>
-#include <version.h>
-#include <app_version.h>
+#include <zephyr/version.h>
+#include <zephyr/app_version.h>
 
 LOG_MODULE_REGISTER(oresat_zephyr_template, LOG_LEVEL_DBG);
 

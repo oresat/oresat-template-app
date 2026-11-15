@@ -4,7 +4,7 @@
  */
 
 
-#include <nxp/mcx/MCXN947VNL-pinctrl.h>
+#include <nxp/mcx/mcxn/pinctrl/MCXN947VNL-pinctrl.h>
 
 &pinctrl {
 
