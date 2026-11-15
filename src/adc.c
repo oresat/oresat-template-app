@@ -22,7 +22,7 @@
 #include <zephyr/drivers/adc.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_REGISTER(oresat_adc_demo, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(oresat_adc_demo, LOG_LEVEL_INF);
 
 /* size of stack area used by each thread */
 #define STACKSIZE 1024
@@ -31,7 +31,7 @@ LOG_MODULE_REGISTER(oresat_adc_demo, LOG_LEVEL_DBG);
 #define PRIORITY 7
 
 /* 1000 msec = 1 sec */
-#define ADC_SLEEP_TIME_MS 100 /* Use 5 to generate more data to graph samples that follow the DAC output */
+#define ADC_SLEEP_TIME_MS 500 /* Use 5 to generate more data to graph samples that follow the DAC output */
 
 /* ADC node from the devicetree. */
 #define ADC_NODE DT_ALIAS(adc0)

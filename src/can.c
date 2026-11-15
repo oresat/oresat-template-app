@@ -7,7 +7,6 @@
 #include <zephyr/dfu/mcuboot.h>
 #include <canopennode.h>
 #include <CO_OD.h>
-#include <board_sensors.h>
 #include <oresat.h>
 
 LOG_MODULE_REGISTER(can_thread, LOG_LEVEL_DBG);
@@ -59,9 +58,14 @@ static void handle_can(void *p1, void *p2, void *p3)
 				LOG_ERR("Failed to confirm MCUboot image: %d", rc);
 			}
 		} else {
-			LOG_ERR("Self-tests failed. Rebooting to revert firmware...");
+			LOG_ERR("Self-tests failed.");
 			k_msleep(500); // Let logs flush
+#if defined(CONFIG_REBOOT)
+			LOG_ERR("Rebooting to revert firmware...");
 			sys_reboot(SYS_REBOOT_COLD);
+#else
+			LOG_ERR("Please reboot to revert firmware.");
+#endif
 		}
 	} else {
 		LOG_INF("Firmware already confirmed.");
@@ -72,11 +76,10 @@ static void handle_can(void *p1, void *p2, void *p3)
 	LOG_DBG("Opening CAN device");
 	if (!device_is_ready(can.dev)) {
 		LOG_ERR("CAN interface is not ready");
-		k_msleep(1000);
-		__ASSERT(false, "Fatal error");
+		goto fatal_error;
 	}
 
-	LOG_INF("Starting CANopenNode (node_id=%u, bitrate=%u kbps)",
+	LOG_INF("Starting CANopenNode (node_id=0x%02x, bitrate=%u kbps)",
 			(unsigned)node_id, (unsigned)CAN_BITRATE);
 
 	while (reset != CO_RESET_APP) {
@@ -86,8 +89,7 @@ static void handle_can(void *p1, void *p2, void *p3)
 		err = CO_init(&can, node_id, CAN_BITRATE);
 		if (err != CO_ERROR_NO) {
 			LOG_ERR("CO_init failed (err = %d)", err);
-			k_msleep(1000);
-			__ASSERT(false, "Fatal error");
+			goto fatal_error;
 		}
 
 		if (IS_ENABLED(CONFIG_BOOTLOADER_MCUBOOT)) {
@@ -137,22 +139,28 @@ static void handle_can(void *p1, void *p2, void *p3)
 				CO_process_RPDO(CO, syncWas);
 
 				/* Write outputs */
-				CO_process_TPDO(CO, syncWas,  elapsed * 1000U);
+				CO_process_TPDO(CO, syncWas, timeout * 1000U);
 
 				k_sleep(K_MSEC(timeout));
 				elapsed = (uint32_t)k_uptime_delta(&timestamp);
 			} else {
 				elapsed = 0U;
 			}
-
-			if (reset == CO_RESET_COMM) {
-				LOG_INF("Resetting communication");
-			}
+		}
+		if (reset == CO_RESET_COMM) {
+			LOG_INF("Resetting communication");
 		}
 	}
 
+	// The CAN host asked us to reset ourselves. Clean up and then do so (if enabled in this build).
 	CO_delete(&can);
+#if defined(CONFIG_REBOOT)
 	sys_reboot(SYS_REBOOT_COLD);
+#endif
+
+fatal_error:
+	k_msleep(1000);
+	__ASSERT(false, "Fatal error");
 }
 
 K_THREAD_DEFINE(can_id, CAN_THREAD_STACK_SIZE, handle_can, NULL, NULL, NULL, CAN_THREAD_PRIORITY, 0, 0);

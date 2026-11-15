@@ -41,6 +41,7 @@ if BOARD_OVERLAY_PRESENT
 		bool "Enable sending CAN packets."
 		default y
 		select CAN
+		select CANOPEN
 		select CANOPENNODE
 		select USE_STM32_HAL_FLASH if SOC_STM32F091XC
 		select USE_STM32_HAL_FLASH_EX if SOC_STM32F091XC
